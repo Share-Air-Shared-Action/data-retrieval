@@ -27,8 +27,8 @@
 3 0 * * * /data/sasa_airquality/purpleair/curlpurple.sh
 10 0 * * * /data/sasa_airquality/purpleair/purpleairload.sh
 
-3 0 * * * /data/sasa_airquality/airbeamterrier/curlairterrier.sh
-10 0 * * * /data/sasa_airquality/airbeamterrier/airterrierload.sh
+#3 0 * * * /data/sasa_airquality/airbeamterrier/curlairterrier.sh
+#10 0 * * * /data/sasa_airquality/airbeamterrier/airterrierload.sh
 
 3 0 * * * /data/sasa_airquality/aeroqual/Little\ Village/load.sh
 
