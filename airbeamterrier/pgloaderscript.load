@@ -1,0 +1,71 @@
+LOAD CSV  
+   FROM 'SASA_AB1.json.csv' WITH ENCODING iso-646-us  
+        
+   INTO postgresql://postgres@localhost:5432/sasa_airquality?airterrier  
+   WITH   
+        skip header = 2,  
+        fields optionally enclosed by '"',  
+        fields escaped by backslash-quote,  
+        fields terminated by ','  
+ 
+    SET work_mem to '32 MB', maintenance_work_mem to '64 MB'; 
+
+LOAD CSV
+   FROM 'SASA_AB2.json.csv' WITH ENCODING iso-646-us
+
+   INTO postgresql://postgres@localhost:5432/sasa_airquality?airterrier
+   WITH 
+        skip header = 2,
+        fields optionally enclosed by '"',
+        fields escaped by backslash-quote,
+        fields terminated by ','
+
+    SET work_mem to '32 MB', maintenance_work_mem to '64 MB';
+
+LOAD CSV
+   FROM 'SASA_AB3.json.csv' WITH ENCODING iso-646-us
+
+   INTO postgresql://postgres@localhost:5432/sasa_airquality?airterrier
+   WITH 
+        skip header = 2,
+        fields optionally enclosed by '"',
+        fields escaped by backslash-quote,
+        fields terminated by ','
+
+    SET work_mem to '32 MB', maintenance_work_mem to '64 MB';
+
+LOAD CSV
+   FROM 'SASA_AB4.json.csv' WITH ENCODING iso-646-us
+
+   INTO postgresql://postgres@localhost:5432/sasa_airquality?airterrier
+   WITH 
+        skip header = 2,
+        fields optionally enclosed by '"',
+        fields escaped by backslash-quote,
+        fields terminated by ','
+
+    SET work_mem to '32 MB', maintenance_work_mem to '64 MB';
+
+LOAD CSV
+   FROM 'SASA_AB5.json.csv' WITH ENCODING iso-646-us
+
+   INTO postgresql://postgres@localhost:5432/sasa_airquality?airterrier
+   WITH 
+        skip header = 2,
+        fields optionally enclosed by '"',
+        fields escaped by backslash-quote,
+        fields terminated by ','
+
+    SET work_mem to '32 MB', maintenance_work_mem to '64 MB';
+
+LOAD CSV
+   FROM 'SASA_AB6.json.csv' WITH ENCODING iso-646-us
+
+   INTO postgresql://postgres@localhost:5432/sasa_airquality?airterrier
+   WITH
+        skip header = 2,
+        fields optionally enclosed by '"',
+        fields escaped by backslash-quote,
+        fields terminated by ','
+
+    SET work_mem to '32 MB', maintenance_work_mem to '64 MB';

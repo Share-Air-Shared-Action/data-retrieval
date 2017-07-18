@@ -1,0 +1,6 @@
+dump/
+.DS_Store
+*.csv
+*.json
+apikey.sh
+sasa-fingolfin.pub

@@ -1,0 +1,11 @@
+
+for file in /data/sasa_airquality/airbeam/SASA_PA*
+do
+  python3 /data/sasa_airquality/airbeamterrier/ijsontest.py "$file" 
+done
+
+#pgloader /data/sasa_airquality/airbeamterrier/data.load
+
+
+#after load remove all csv files.
+rm /data/sasa_airqualitypurpleair/*csv

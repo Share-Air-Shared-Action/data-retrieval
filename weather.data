@@ -1,0 +1,10 @@
+LOAD CSV
+   FROM 'sasa_weather.csv' WITH ENCODING iso-646-us
+   INTO postgresql://postgres@localhost:5432/sasa_airquality?weather
+   WITH
+        skip header = 2,
+        fields optionally enclosed by '"',
+        fields escaped by backslash-quote,
+        fields terminated by ','
+
+    SET work_mem to '32 MB', maintenance_work_mem to '64 MB';
