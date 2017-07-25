@@ -21,7 +21,7 @@
 #
 # m h  dom mon dow   command
 30 20 * * * ./import-sql.sh
-3 0 * * * /data/sasa_airquality/metone/curlmetone.sh
+3 0 * * * /data/sasa_airquality/metone/curlmetone.sh 12396 12397 12398
 10 0 * * * /data/sasa_airquality/metone/metoneload.sh
 
 3 0 * * * /data/sasa_airquality/purpleair/curlpurple.sh
