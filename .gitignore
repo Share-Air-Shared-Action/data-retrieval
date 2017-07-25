@@ -4,3 +4,4 @@ dump/
 *.json
 apikey.sh
 sasa-fingolfin.pub
+*.log
