@@ -24,8 +24,9 @@
 3 0 * * * /data/sasa_airquality/metone/curlmetone.sh 12396 12397 12398
 10 0 * * * /data/sasa_airquality/metone/metoneload.sh
 
-3 0 * * * /data/sasa_airquality/purpleair/curlpurple.sh
+3 0 * * * python /data/sasa_airquality/purpleair/newtool.py
 10 0 * * * /data/sasa_airquality/purpleair/purpleairload.sh
+15 0 * * * pgloader /data/sasa_airquality/purpleair/downloads/pgloaderfile.load
 
 3 0 * * * /data/sasa_airquality/airbeamterrier/curlairterrier.sh
 #10 0 * * * /data/sasa_airquality/airbeamterrier/airterrierload.sh
