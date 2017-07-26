@@ -31,5 +31,8 @@ for row in reader:
 	# Add the error column
 	row.append('')
 
+	# Add the community column
+	row.append('')
+
 	# Write the row to the file
 	writer.writerow(row)
