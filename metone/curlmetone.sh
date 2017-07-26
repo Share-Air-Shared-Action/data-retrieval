@@ -3,7 +3,7 @@
 # e.x. curlmetone.sh 12396 12397 12398
 
 # Set the path of the output directory
-outputDir="/data/sasa_airquality/metone/"
+outputDir="/data/sasa_airquality/metone"
 
 # Set the name of the log file
 logFile="curlmetone.log"
@@ -18,15 +18,18 @@ if [ $# -eq 0 ]
     echo $error 1>&2
 
     # Append the error to the log file.
-    echo $error >> $outputDir$logFile
+    echo $error >> $outputDir/$logFile
     exit 1
 fi
 
 # Redirect all output to a log file
-exec &>> $outputDir$logFile
+exec &>> $outputDir/$logFile
+
+# Log the current date/time
+echo "[$(date)] Starting curlmetone.sh with output directory $outputDir"
 
 # Get API key
-. ./apikey.sh
+. $outputDir/apikey.sh
 
 # Set the start and end date
 end_date=$(date)
@@ -37,11 +40,11 @@ startms=$(date "+%s%3N" -d "$start_date")
 endms=$(date "+%s%3N" -d "$end_date")
 
 
-echo "Downloading data from Met One devices between $start_date and $end_date."
-echo "Calculated milliseconds since epoch. Start: $startms End: $endms"
+echo "[$(date)] Downloading data between $start_date and $end_date."
+echo "[$(date)] Calculated milliseconds since epoch. Start: $startms End: $endms"
 
 for compId in "$@"
 do
-  echo "Downloading data for compId $compId..."
-  curl "https://www.grovestreams.com/api/comp/W$compId/feed?sd=$startms&ed=$endms&retStreamId&api_key=$apikey" > "$outputDir$compId.json"
+  echo "[$(date)] Downloading data for compId $compId..."
+  curl "https://www.grovestreams.com/api/comp/W$compId/feed?sd=$startms&ed=$endms&retStreamId&api_key=$apikey" > "$outputDir/$compId.json"
 done
