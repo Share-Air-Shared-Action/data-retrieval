@@ -16,18 +16,12 @@ for filename in glob.glob(sys.argv[1]):
         # Unsure exactly what this was for, but it was commented out:
         #a,b=filename.split(".")
 
-        # Print the filename for debugging
-        print(filename)
-
         # Get the part of the filename that is the device id.
         head,tail = os.path.split(filename)
         newfile=tail.split('.')
 
         # Convert the device id to an integer
         a=int(newfile[0])
-
-        # Print the device id for debugging
-        print(a)
 
         # For each row in the CSV
         for i, row in enumerate(csv.reader(finput)):

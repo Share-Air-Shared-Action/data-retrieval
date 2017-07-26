@@ -1,17 +1,44 @@
 #!/bin/bash
 
-# This helps with debugging
-set -x #echo on
+# Set the path of the working directory
+workingDir="/data/sasa_airquality/metone"
+
+# Set the path of the download directory
+downloadDir="/data/sasa_airquality/metone/downloads"
+
+# Set the name of the log file
+logFile="metoneload.log"
+
+# Redirect all output to a log file
+exec &>> $workingDir/$logFile
+
+# Log the current date/time
+echo "[$(date)] Starting metoneload.sh with working directory $workingDir"
 
 # Run a Python script to convert the downloaded JSON to CSV.
-python /data/sasa_airquality/metone/json_to_csv.py : /data/sasa_airquality/metone/12396.json /data/sasa_airquality/metone/12396.csv
-python /data/sasa_airquality/metone/json_to_csv.py : /data/sasa_airquality/metone/12397.json /data/sasa_airquality/metone/12397.csv
-python /data/sasa_airquality/metone/json_to_csv.py : /data/sasa_airquality/metone/12398.json /data/sasa_airquality/metone/12398.csv
 
-# Run a Python script to process the converted CSV to change data types and add columns before import.
-python /data/sasa_airquality/metone/makedata.py /data/sasa_airquality/metone/12396.csv
-python /data/sasa_airquality/metone/makedata.py /data/sasa_airquality/metone/12397.csv
-python /data/sasa_airquality/metone/makedata.py /data/sasa_airquality/metone/12398.csv
+# For each JSON file in the download directory
+for file in $downloadDir/*.json
+do
+  echo "[$(date)] Converting $file to CSV..."
+
+  # Set temp to the filename
+  outFilename=${file##*/}
+
+  # Change extension of filename to csv
+  outFilename=${outFilename%.*}.csv
+
+  # Run the converter on the file
+  python $workingDir/json_to_csv.py : "$file" $downloadDir/$outFilename
+
+  echo "[$(date)] Parsing $downloadDir/$outFilename..."
+
+  # Run the parser on the file
+  python $workingDir/makedata.py $downloadDir/$outFilename
+
+done
+
+echo "[$(date)] Loading data into database..."
 
 # Load the CSVs into the database.
-pgloader /data/sasa_airquality/metone/metload.data
+pgloader $downloadDir/metload.data

@@ -2,8 +2,11 @@
 # Gets the compIds from the provided arguments
 # e.x. curlmetone.sh 12396 12397 12398
 
-# Set the path of the output directory
-outputDir="/data/sasa_airquality/metone"
+# Set the path of the working directory
+workingDir="/data/sasa_airquality/metone"
+
+# Set the path of the download directory
+downloadDir="/data/sasa_airquality/metone/downloads"
 
 # Set the name of the log file
 logFile="curlmetone.log"
@@ -18,18 +21,18 @@ if [ $# -eq 0 ]
     echo $error 1>&2
 
     # Append the error to the log file.
-    echo $error >> $outputDir/$logFile
+    echo $error >> $workingDir/$logFile
     exit 1
 fi
 
 # Redirect all output to a log file
-exec &>> $outputDir/$logFile
+exec &>> $workingDir/$logFile
 
 # Log the current date/time
-echo "[$(date)] Starting curlmetone.sh with output directory $outputDir"
+echo "[$(date)] Starting curlmetone.sh with output directory $workingDir and download directory $downloadDir"
 
 # Get API key
-. $outputDir/apikey.sh
+. $workingDir/apikey.sh
 
 # Set the start and end date
 end_date=$(date)
@@ -46,5 +49,5 @@ echo "[$(date)] Calculated milliseconds since epoch. Start: $startms End: $endms
 for compId in "$@"
 do
   echo "[$(date)] Downloading data for compId $compId..."
-  curl "https://www.grovestreams.com/api/comp/W$compId/feed?sd=$startms&ed=$endms&retStreamId&api_key=$apikey" > "$outputDir/$compId.json"
+  curl "https://www.grovestreams.com/api/comp/W$compId/feed?sd=$startms&ed=$endms&retStreamId&api_key=$apikey" > "$downloadDir/$compId.json"
 done
