@@ -31,8 +31,8 @@ fi
 exec &>> $outputDir$logFile
 
 # Set the start and end date
-end_date=$(date "+%Y-%m-%d")
-start_date=$(date --date="${end_date} -${diff} day" +%Y-%m-%d)
+start_date=$(date "+%Y-%m-%d")
+end_date=$(date --date="${start_date} -${diff} day" +%Y-%m-%d)
 
 echo "Downloading data from Purple Air device with name $outputfilename for the date range of $start_date to $end_date using thingspeak ID $thingspeak_id and API key $thingspeak_apikey."
 
