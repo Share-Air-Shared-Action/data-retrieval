@@ -41,4 +41,5 @@ done
 echo "[$(date)] Loading data into database..."
 
 # Load the CSVs into the database.
+# TODO: Currently this metload.data file has the input filenames hard-coded
 pgloader $downloadDir/metload.data
