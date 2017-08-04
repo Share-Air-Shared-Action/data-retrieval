@@ -5,16 +5,22 @@
 # Set the path of the input directory
 inputDir="/data/sasa_airquality/purpleair/downloads"
 
+# Set the filename of the log file
+logFile="/data/sasa_airquality/purpleair/logs/purpleairload.log"
+
+# Redirect all output to a log file
+exec &>> $logFile
+
+# Log the current date/time
+echo "[$(date)] Starting purpleairload.sh with input directory $inputDir"
+
 # For each CSV in the input directory
 for file in $inputDir/SASA*.csv
 do
+  echo "[$(date)] Parsing $file"
   # Run the parser on the file
   python3 /data/sasa_airquality/purpleair/parseCSV.py "$file"
 done
 
-# For each parsed CSV
-for file in $inputDir/newSASA*.csv
-do
-  # Run the import command on the file
-   pgloader --type csv --with "skip header = 2" --with "fields fields optionally enclosed by '\"'" --with "fields escaped by backslash-quote" --with "fields terminated by ','" "$file" postgresql://postgres@localhost:5432/sasa_airquality?purpleairprimary
-done
+# Run the import command
+pgloader $inputDir/pgloaderfile.load

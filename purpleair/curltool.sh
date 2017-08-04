@@ -6,8 +6,8 @@
 # Set the path of the output directory
 outputDir="/data/sasa_airquality/purpleair/downloads/"
 
-# Set the name of the log file
-logFile="curlpurpleair.log"
+# Set the filename of the log file
+logFile="/data/sasa_airquality/purpleair/logs/curlpurpleair.log"
 
 # Check if arguments supplied
 if [ $# -ne 3 ]
@@ -19,7 +19,7 @@ if [ $# -ne 3 ]
     echo $error 1>&2
 
     # Append the error to the log file.
-    echo $error >> $outputDir$logFile
+    echo $error >> $logFile
     exit 1
   else
     thingspeak_id=$1
@@ -28,7 +28,7 @@ if [ $# -ne 3 ]
 fi
 
 # Redirect all output to a log file
-exec &>> $outputDir$logFile
+exec &>> $logFile
 
 # Set the start and end date
 start_date=$(date "+%Y-%m-%d")
