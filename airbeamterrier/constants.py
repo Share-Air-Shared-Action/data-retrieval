@@ -1,5 +1,0 @@
-
-
-
-JSON_EXTENSION = "*.json"
-
