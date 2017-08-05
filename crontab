@@ -27,11 +27,10 @@
 3 0 * * * python /data/sasa_airquality/purpleair/newtool.py
 10 0 * * * /data/sasa_airquality/purpleair/purpleairload.sh
 
-3 0 * * * /data/sasa_airquality/airbeamterrier/curlairterrier.sh
-#10 0 * * * /data/sasa_airquality/airbeamterrier/airterrierload.sh
+3 0 * * * python /data/sasa_airquality/airbeamterrier/airbeamterrier.py
 
 3 0 * * * /data/sasa_airquality/aeroqual/Little\ Village/load.sh
 
-20 0 * * * psql -d sasa_airquality -f /data/sasa_airquality/triggers.sql
+30 0 * * * psql -d sasa_airquality -f /data/sasa_airquality/triggers.sql
 
 #run all crontab operations from root 'postgres' user only
