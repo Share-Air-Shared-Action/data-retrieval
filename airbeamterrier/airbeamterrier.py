@@ -8,19 +8,15 @@ import keys
 usernames = ["SASA_AB1", "SASA_AB2", "SASA_AB3", "SASA_AB4", "SASA_AB5", "SASA_AB6"]
 
 # Get the current day of the year
-#today_day_of_year = datetime.now().timetuple().tm_yday
-# FOR TESTING PURPOSES
-today_day_of_year = 215
+today_day_of_year = datetime.now().timetuple().tm_yday
 
 # Get yesterday's day of the year
-#yesterday_day_of_year = today_day_of_year - 1
-# FOR TESTING PURPOSES
-yesterday_day_of_year = 200
+yesterday_day_of_year = today_day_of_year - 1
 
 for username in usernames:
     allSessionsURL = "http://aircasting.org/api/sessions.json?page=0&page_size=50&q%5Btime_from%5D=0&q%5Btime_to%5D=2359&q%5Bday_from%5D=" + str(yesterday_day_of_year) + "&q%5Bday_to%5D=" + str(today_day_of_year) + "&q%5Busernames%5D=" + username + "&q%5Blocation%5D=Chicago&q%5Bunit_symbol%5D=%C2%B5g%2Fm"
 
-    print("Requesting sessions for " + username + " from day " + str(yesterday_day_of_year) + " to " + str(today_day_of_year))
+    print("[" + str(datetime.now()) + "] Requesting sessions for " + username + " from day " + str(yesterday_day_of_year) + " to " + str(today_day_of_year))
 
     try:
         # Get the JSON from the URL
@@ -28,6 +24,11 @@ for username in usernames:
 
         # Parse the JSON
         allSessionsData = json.loads(allSessionsResponse)
+
+        # Debugging message
+        print("[" + str(datetime.now()) + "] Got " + str(len(allSessionsData)) + " sessions.")
+
+        sessionCount = 1
 
         # For each entry in the JSON
         for item in allSessionsData:
@@ -38,8 +39,8 @@ for username in usernames:
             # Time to request the JSON for the specific ID
             sessionURL = "http://aircasting.org/api/sessions/" + str(currentID) + ".json"
 
-            print("Requesting data from session " + str(currentID) + " of " + username)
-
+            print("[" + str(datetime.now()) + "] [" + str(sessionCount) + " of " + str(len(allSessionsData)) + "] Requesting data from session " + str(currentID) + " of " + username)
+            sessionCount += 1
             try:
                 # Get the JSON from the URL
                 currentSessionResponse = urllib.urlopen(sessionURL).read()
@@ -49,7 +50,7 @@ for username in usernames:
 
                 # Set the session title
                 session_title = currentSessionData['title']
-                print("Session data found. Session title: " + session_title)
+                print("[" + str(datetime.now()) + "] Session data found. Session title: " + session_title)
 
                 # For each stream within the current session
                 for streamname, streamdata in currentSessionData['streams'].iteritems():
@@ -58,15 +59,24 @@ for username in usernames:
                     measurement_type = streamdata['measurement_type']
 
                     # Then print some debugging info
-                    print("Entering data from stream " + streamname + " (" + measurement_type+ ") into database...")
+                    print("[" + str(datetime.now()) + "] Entering data from stream " + streamname + " (" + measurement_type+ ") into database...")
 
                     # Set the rest of the values
                     average_value = streamdata['average_value']
                     sensor_package_name = streamdata['sensor_package_name']
                     unit_name = streamdata['unit_name']
 
+                    measurementCount = 1
+
+                    print("[" + str(datetime.now()) + "] Found " + str((streamdata['size'])) + " records in this stream.")
                     # For each specific measurement within the stream
                     for measurement in streamdata['measurements']:
+
+                        # Print the status of record entry in database.
+                        print ("\rEntering record " + str(measurementCount) + " of " + str((streamdata['size'])) + " into database..."),
+                        if (measurementCount == streamdata['size']):
+                            print("\r[" + str(datetime.now()) + "] Finished entering records for stream.")
+                        measurementCount += 1
 
                         # Set the values for the measurement
                         latitude = measurement['latitude']
@@ -80,7 +90,7 @@ for username in usernames:
                             dbConnection.autocommit = True
 
                         except:
-                            print("Error connecting to database...")
+                            print("[" + str(datetime.now()) + "] Error connecting to database...")
                             sys.exit(-1)
 
                         try:
@@ -90,9 +100,11 @@ for username in usernames:
                                              VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",(session_title, username, average_value, measurement_type, sensor_package_name, unit_name, latitude, longitude, measured_value, time))
 
                         except psycopg2.Error as e:
-                            print("An error occurred entering data into database. Details:\n" + e.pgerror)
+                            # No need to log duplicity errors
+                            if ("23505" not in e.pgcode):
+                                print("[" + str(datetime.now()) + "] An error occurred entering data into database. Details:\n" + e.pgerror)
 
             except:
-                print("An error occurred requesting or processing data from session " + str(currentID) + " of " + username)
+                print("[" + str(datetime.now()) + "] An error occurred requesting or processing data from session " + str(currentID) + " of " + username)
     except:
-        print("An error occurred requesting sessions for " + username + " from day " + str(yesterday_day_of_year) + " to " + str(today_day_of_year))
+        print("[" + str(datetime.now()) + "] An error occurred requesting sessions for " + username + " from day " + str(yesterday_day_of_year) + " to " + str(today_day_of_year))
