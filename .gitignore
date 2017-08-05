@@ -5,3 +5,5 @@ dump/
 apikey.sh
 sasa-fingolfin.pub
 *.log
+*.pyc
+keys.py
