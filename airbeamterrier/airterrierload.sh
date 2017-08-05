@@ -1,8 +1,11 @@
-python3 /data/sasa_airquality/airbeamterrier/ijsontest.py /data/sasa_airquality/airbeamterrier/SASA_AB1.json
-python3 /data/sasa_airquality/airbeamterrier/ijsontest.py /data/sasa_airquality/airbeamterrier/SASA_AB2.json
-python3 /data/sasa_airquality/airbeamterrier/ijsontest.py /data/sasa_airquality/airbeamterrier/SASA_AB3.json
-python3 /data/sasa_airquality/airbeamterrier/ijsontest.py /data/sasa_airquality/airbeamterrier/SASA_AB4.json
-python3 /data/sasa_airquality/airbeamterrier/ijsontest.py /data/sasa_airquality/airbeamterrier/SASA_AB5.json
-python3 /data/sasa_airquality/airbeamterrier/ijsontest.py /data/sasa_airquality/airbeamterrier/SASA_AB6.json
+#!/bin/bash
 
-#pgloader /data/sasa_airquality/airbeamterrier/pgloaderscript.load
+# This file redirects output of the python script to a log file
+
+# Set the filename of the log file
+logFile="/data/sasa_airquality/airbeamterrier/logs/airbeamterrier.log"
+
+# Redirect all output to a log file
+exec &>> $logFile
+
+python /data/sasa_airquality/airbeamterrier/airbeamterrier.py
