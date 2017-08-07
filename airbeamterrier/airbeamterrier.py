@@ -61,7 +61,7 @@ for username in usernames:
                 currentSessionData = json.loads(currentSessionResponse)
 
                 # Set the session title
-                session_title = currentSessionData['title']
+                session_title = currentSessionData['title'].strip()
 
                 debugMessage("[" + str(datetime.now()) + "] Session data found. Session title: " + session_title)
 
