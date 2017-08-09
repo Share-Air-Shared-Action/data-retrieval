@@ -1,6 +1,6 @@
 # This file gets a list of sessions from the Aircasting API, then downloads the JSON for each session from the API, parses it and puts it into the database
 
-import json, urllib, sys, os, psycopg2
+import json, urllib, sys, os, psycopg2, pytz
 from datetime import datetime
 import keys
 
@@ -22,6 +22,9 @@ today_day_of_year = datetime.now().timetuple().tm_yday
 
 # Get yesterday's day of the year
 yesterday_day_of_year = today_day_of_year - 1
+
+# Set the timezone
+tz = pytz.timezone("America/Chicago")
 
 for username in usernames:
     allSessionsURL = "http://aircasting.org/api/sessions.json?page=0&page_size=50&q%5Btime_from%5D=0&q%5Btime_to%5D=2359&q%5Bday_from%5D=" + str(yesterday_day_of_year) + "&q%5Bday_to%5D=" + str(today_day_of_year) + "&q%5Busernames%5D=" + username + "&q%5Blocation%5D=Chicago&q%5Bunit_symbol%5D=%C2%B5g%2Fm"
@@ -97,7 +100,10 @@ for username in usernames:
                         # Set the values for the measurement
                         latitude = measurement['latitude']
                         longitude = measurement['longitude']
-                        time = measurement['time']
+
+                        # Add the timezone to the time (conver from string to datetime object first)
+                        time = tz.localize(datetime.strptime(measurement['time'], '%Y-%m-%dT%H:%M:%SZ'))
+
                         measured_value = measurement['value']
 
                         # Finally, we need to enter this data into the database
