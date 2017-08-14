@@ -25,11 +25,11 @@ update aeroqualo3 set season='Pilot' where season IS NULL and (date>= '2017-04-1
 update aeroqualo3 set season='Summer' where season IS NULL and (date> '2017-06-05 00:00:00-00' and date<= '2017-10-01 00:00:00-00');
 update aeroqualo3 set season='Winter' where season IS NULL and (date> '2017-10-01 00:00:00-00');
 
-update purpleairprimary set season= 'Pilot' where season IS NULL and (created_at>='2017-04-17 00:00:00-00' and created_at<= '2017-04-26 00:00:00-00');
-update purpleairprimary set season= 'Summer'  where season IS NULL and (created_at> '2017-06-05 00:00:00-00' and  created_at<= '2017-10-01 00:00:00-00');
+update purpleairprimary set season= 'Pilot' where season IS NULL and (created_at < '2017-06-05 00:00:00-00');
+update purpleairprimary set season= 'Summer'  where season IS NULL and (created_at >= '2017-06-05 00:00:00-00' and  created_at <= '2017-10-01 00:00:00-00');
 update purpleairprimary set season= 'Winter' where season IS NULL and (created_at> '2017-10-01 00:00:00-00');
 
-update purpleairprimary set community='LV' where community IS NULL and (created_at >= '2017-06-05 00:00:00-00' and created_at < '2017-07-01 00:00:00-00');
+update purpleairprimary set community='LV' where community IS NULL and (created_at < '2017-07-01 00:00:00-00');
 update purpleairprimary set community='SE' where community IS NULL and (created_at >= '2017-07-01 00:00:00-00' and created_at <= '2017-08-01 00:00:00-00');
 
 update purpleairsecondary set season='Pilot' where  season IS NULL and (created_at>='2017-04-17 00:00:00-00' and created_at<= '2017-04-26 00:00:00-00');
