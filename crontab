@@ -26,6 +26,7 @@
 
 3 0 * * * python /data/sasa_airquality/purpleair/newtool.py
 10 0 * * * /data/sasa_airquality/purpleair/purpleairload.sh
+3 0 * * * python /data/sasa_airquality/purpleair/stationarylocations.py
 
 3 0 * * * python /data/sasa_airquality/airbeamterrier/airbeamterrier.py
 
