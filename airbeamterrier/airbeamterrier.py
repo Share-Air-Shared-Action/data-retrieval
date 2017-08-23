@@ -20,8 +20,8 @@ usernames = ["SASA_AB1", "SASA_AB2", "SASA_AB3", "SASA_AB4", "SASA_AB5", "SASA_A
 # Get the current day of the year
 today_day_of_year = datetime.now().timetuple().tm_yday
 
-# Get yesterday's day of the year
-yesterday_day_of_year = today_day_of_year - 1
+# Get 2 days ago day of the year
+yesterday_day_of_year = today_day_of_year - 2
 
 # Set the timezone
 tz = pytz.timezone("America/Chicago")
