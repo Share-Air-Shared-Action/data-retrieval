@@ -16,6 +16,7 @@ update metone set type='pm25' where type='conc' and unit_id='SASA_MO2';
 
 update metone set community='LV' where community IS NULL and (time>= '2017-06-05 00:00:00-00' and time < '2017-07-01 00:00:00-00');
 update metone set community='SE' where community IS NULL and (time>= '2017-07-01 00:00:00-00' and time <= '2017-08-01 00:00:00-00');
+update metone set community='PC' where community IS NULL and (time >= '2017-08-09 00:00:00-00' and time < '2017-08-31 00:00:00-00');
 
 update airterrier set season='Pilot' where season IS NULL and (time>= '2017-04-17 00:00:00-00' and time<= '2017-04-30 00:00:00-00');
 update airterrier set season='Summer' where season IS NULL and ( time> '2017-06-05 00:00:00-00' and time<= '2017-10-01 00:00:00-00');
@@ -31,6 +32,7 @@ update purpleairprimary set season= 'Winter' where season IS NULL and (created_a
 
 update purpleairprimary set community='LV' where community IS NULL and (created_at < '2017-07-01 00:00:00-00');
 update purpleairprimary set community='SE' where community IS NULL and (created_at >= '2017-07-01 00:00:00-00' and created_at <= '2017-08-01 00:00:00-00');
+update purpleairprimary set community='PC' where community IS NULL and (created_at >= '2017-08-09 00:00:00-00' and created_at < '2017-08-31 00:00:00-00');
 
 update purpleairsecondary set season='Pilot' where  season IS NULL and (created_at>='2017-04-17 00:00:00-00' and created_at<= '2017-04-26 00:00:00-00');
 update purpleairsecondary set season='Summer' where season IS NULL and (created_at> '2017-06-05 00:00:00-00' and  created_at<= '2017-10-01 00:00:00-00');
