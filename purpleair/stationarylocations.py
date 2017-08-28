@@ -33,12 +33,12 @@ data = json.loads(decoded_response)
 for result in data['results']:
     # If the label starts with SASA (or varied capitalization of it)
     if (result['Label'].upper().startswith("SASA")):
-        sensorname = result['Label'].replace(" ","")
+        sensorname = result['Label'].replace(" ","").upper()
         lat = result['Lat']
         lon = result['Lon']
         community = ''
         if (len(sensorname) >= 10):
-            community = sensorname[9] + sensorname [10]
+            community = sensorname.split("_")[2]
 
         debugMessage("Entering sensor '" + sensorname + "' with lat: " + lat + " and with long: " + lon + " and with community " + community)
 
