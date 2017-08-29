@@ -54,8 +54,16 @@ for result in data['results']:
         try:
             dbCursor = dbConnection.cursor()
 
-            dbCursor.execute("""INSERT INTO stationarylocations (unit_id, latitude, longitude, community)
-                             VALUES (%s, %s, %s, %s)""",(sensorname, lat, lon, community))
+            # Check to see if this Unit ID and community already exists
+            dbCursor.execute("""SELECT unit_id FROM stationarylocations WHERE unit_id=%s AND community=%s""",(sensorname, community))
+
+            # If the Unit ID and community already exists, update the lat/long
+            if (dbCursor.fetchone() is not None):
+                dbCursor.execute("""UPDATE stationarylocations SET latitude=%s, longitude=%s WHERE unit_id=%s and community=%s""",(lat, lon, sensorname, community))
+
+            # Otherwise add it
+            else:
+                dbCursor.execute("""INSERT INTO stationarylocations (unit_id, latitude, longitude, community) VALUES (%s, %s, %s, %s)""",(sensorname, lat, lon, community))
 
         except psycopg2.Error as e:
             # No need to log duplicity errors
