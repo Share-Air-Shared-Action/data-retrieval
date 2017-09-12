@@ -1,4 +1,5 @@
 # This file processes a JSON file to return a list of needed values for Purple Air devices
+# TODO: Add the Lat/Long to the stationarylocations table, enter directly to database instead of pgloader.
 
 import json, urllib
 from subprocess import call
@@ -21,6 +22,7 @@ pgloaderfile = open("/data/sasa_airquality/purpleair/downloads/pgloaderfile.load
 # For each "result" in the JSON
 for result in data['results']:
     # If the label starts with SASA
+    # TODO: Make this work with lowercase SASA, too
     if (result['Label'].startswith("SASA")):
 
         thingspeak_id = result['THINGSPEAK_PRIMARY_ID']
