@@ -57,7 +57,12 @@ update purpleairprimary set community='PC' where (created_at >= '2017-08-09 00:0
 
 ---------------------------------- Set anything else in this section ----------------------------------
 
--- Set data type on metones
-update metone set type='pm10' where type='conc' and unit_id='SASA_MO3';
-update metone set type='pm25' where type='conc' and unit_id='SASA_MO1';
-update metone set type='pm25' where type='conc' and unit_id='SASA_MO2';
+-- Set data type on metones for LV
+update metone set type='pm25' where type='conc' and unit_id='SASA_MO1' and community='LV';
+update metone set type='pm25' where type='conc' and unit_id='SASA_MO2' and community='LV';
+update metone set type='pm10' where type='conc' and unit_id='SASA_MO3' and community='LV';
+
+-- Set data type on metones for PC
+update metone set type='pm10' where type='conc' and unit_id='SASA_MO1' and community='PC';
+update metone set type='pm25' where type='conc' and unit_id='SASA_MO2' and community='PC';
+update metone set type='pm10' where type='conc' and unit_id='SASA_MO3' and community='PC';
