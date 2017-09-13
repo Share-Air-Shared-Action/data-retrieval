@@ -15,7 +15,8 @@ def debugMessage(message):
     os.fsync(f.fileno())
 
 # Set the "usernames" for the API call
-usernames = ["SASA_AB1", "SASA_AB2", "SASA_AB3", "SASA_AB4", "SASA_AB5", "SASA_AB6"]
+# These may be changed if they add a new phone
+usernames = ["SASA_AB1", "SASA_AB2", "SASA_AB3", "SASA_AB4", "SASA_AB5", "SASA_AB6", "SASA_AB7", "SASA_AB8", "SASA_AB9"]
 
 # Get the current day of the year
 today_day_of_year = datetime.now().timetuple().tm_yday
