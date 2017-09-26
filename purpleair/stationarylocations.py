@@ -31,43 +31,45 @@ data = json.loads(decoded_response)
 
 # For each "result" in the JSON
 for result in data['results']:
-    # If the label starts with SASA (or varied capitalization of it)
-    if (result['Label'].upper().startswith("SASA")):
-        sensorname = result['Label'].replace(" ","").upper()
-        lat = result['Lat']
-        lon = result['Lon']
-        community = ''
-        if (len(sensorname) >= 10):
-            community = sensorname.split("_")[2]
+    # First check that there is a label
+    if (result['Label']):
+        # If the label starts with SASA (or varied capitalization of it)
+        if (result['Label'].upper().startswith("SASA")):
+            sensorname = result['Label'].replace(" ","").upper()
+            lat = result['Lat']
+            lon = result['Lon']
+            community = ''
+            if (len(sensorname) >= 10):
+                community = sensorname.split("_")[2]
 
-        debugMessage("Entering sensor '" + sensorname + "' with lat: " + lat + " and with long: " + lon + " and with community " + community)
+            debugMessage("Entering sensor '" + sensorname + "' with lat: " + lat + " and with long: " + lon + " and with community " + community)
 
-        try:
-            dbConnection = psycopg2.connect(host=keys.hostname, user=keys.username, password=keys.password, dbname=keys.database)
-            dbConnection.autocommit = True
+            try:
+                dbConnection = psycopg2.connect(host=keys.hostname, user=keys.username, password=keys.password, dbname=keys.database)
+                dbConnection.autocommit = True
 
-        except:
-            debugMessage("Error connecting to database...")
+            except:
+                debugMessage("Error connecting to database...")
 
-            sys.exit(-1)
+                sys.exit(-1)
 
-        try:
-            dbCursor = dbConnection.cursor()
+            try:
+                dbCursor = dbConnection.cursor()
 
-            # Check to see if this Unit ID and community already exists
-            dbCursor.execute("""SELECT unit_id FROM stationarylocations WHERE unit_id=%s AND community=%s""",(sensorname, community))
+                # Check to see if this Unit ID and community already exists
+                dbCursor.execute("""SELECT unit_id FROM stationarylocations WHERE unit_id=%s AND community=%s""",(sensorname, community))
 
-            # If the Unit ID and community already exists, update the lat/long
-            if (dbCursor.fetchone() is not None):
-                dbCursor.execute("""UPDATE stationarylocations SET latitude=%s, longitude=%s WHERE unit_id=%s and community=%s""",(lat, lon, sensorname, community))
+                # If the Unit ID and community already exists, update the lat/long
+                if (dbCursor.fetchone() is not None):
+                    dbCursor.execute("""UPDATE stationarylocations SET latitude=%s, longitude=%s WHERE unit_id=%s and community=%s""",(lat, lon, sensorname, community))
 
-            # Otherwise add it
-            else:
-                dbCursor.execute("""INSERT INTO stationarylocations (unit_id, latitude, longitude, community) VALUES (%s, %s, %s, %s)""",(sensorname, lat, lon, community))
+                # Otherwise add it
+                else:
+                    dbCursor.execute("""INSERT INTO stationarylocations (unit_id, latitude, longitude, community) VALUES (%s, %s, %s, %s)""",(sensorname, lat, lon, community))
 
-        except psycopg2.Error as e:
-            # No need to log duplicity errors
-            if ("23505" not in e.pgcode):
-                debugMessage("An error occurred entering data into database. Details: '" + e.pgerror + "'")
-            else:
-                debugMessage("Sensor '" + sensorname + "' already in database.")
+            except psycopg2.Error as e:
+                # No need to log duplicity errors
+                if ("23505" not in e.pgcode):
+                    debugMessage("An error occurred entering data into database. Details: '" + e.pgerror + "'")
+                else:
+                    debugMessage("Sensor '" + sensorname + "' already in database.")

@@ -22,20 +22,20 @@ pgloaderfile = open("/data/sasa_airquality/purpleair/downloads/pgloaderfile.load
 # For each "result" in the JSON
 for result in data['results']:
     # If the label starts with SASA
-    # TODO: Make this work with lowercase SASA, too
-    if (result['Label'].startswith("SASA")):
+    if (result['Label']):
+        if (result['Label']).upper().startswith("SASA"):
 
-        thingspeak_id = result['THINGSPEAK_PRIMARY_ID']
-        thingspeak_apikey = result['THINGSPEAK_PRIMARY_ID_READ_KEY']
+            thingspeak_id = result['THINGSPEAK_PRIMARY_ID']
+            thingspeak_apikey = result['THINGSPEAK_PRIMARY_ID_READ_KEY']
 
-        # Removing spaces from label, as it messes up name otherwise.
-        outputfilename = result['Label'].replace(" ","")
+            # Removing spaces from label, as it messes up name otherwise.
+            outputfilename = result['Label'].replace(" ","")
 
-        # Call the shell script to download the data
-        call(["sh", "/data/sasa_airquality/purpleair/curltool.sh", thingspeak_id, thingspeak_apikey, outputfilename])
+            # Call the shell script to download the data
+            call(["sh", "/data/sasa_airquality/purpleair/curltool.sh", thingspeak_id, thingspeak_apikey, outputfilename])
 
-        # Write a section of the pgloader file for this item
-        pgloaderfile.write("LOAD CSV\n    FROM 'new" + outputfilename + ".csv' WITH ENCODING iso-646-us\n    INTO postgresql://postgres@localhost:5432/sasa_airquality?purpleairprimary\n    WITH  skip header = 2,\n        fields optionally enclosed by '\"',\n        fields escaped by backslash-quote,\n        fields terminated by ','\n\n    SET work_mem to '32 MB', maintenance_work_mem to '64 MB';\n\n")
+            # Write a section of the pgloader file for this item
+            pgloaderfile.write("LOAD CSV\n    FROM 'new" + outputfilename + ".csv' WITH ENCODING iso-646-us\n    INTO postgresql://postgres@localhost:5432/sasa_airquality?purpleairprimary\n    WITH  skip header = 2,\n        fields optionally enclosed by '\"',\n        fields escaped by backslash-quote,\n        fields terminated by ','\n\n    SET work_mem to '32 MB', maintenance_work_mem to '64 MB';\n\n")
 
 # Close the pgloaderfile
 pgloaderfile.close()
