@@ -35,22 +35,28 @@ for result in data['results']:
     if (result['Label']):
         # If the label starts with SASA (or varied capitalization of it)
         if (result['Label'].upper().startswith("SASA")):
+            # Replace any spaces and hyphens, then put in uppercase
             sensorname = result['Label'].replace(" ","").replace("-","_").upper()
             lat = result['Lat']
             lon = result['Lon']
+
+            # Reset community
             community = ''
+
+            # If size is correct to contain a community
             if (len(sensorname) >= 10):
+                # Get the community from the 3rd spot between _
                 community = sensorname.split("_")[2]
 
             debugMessage("Entering sensor '" + sensorname + "' with lat: " + lat + " and with long: " + lon + " and with community " + community)
 
+            # Connect to the database using keys.py
             try:
                 dbConnection = psycopg2.connect(host=keys.hostname, user=keys.username, password=keys.password, dbname=keys.database)
                 dbConnection.autocommit = True
 
             except:
                 debugMessage("Error connecting to database...")
-
                 sys.exit(-1)
 
             try:
@@ -68,7 +74,7 @@ for result in data['results']:
                     dbCursor.execute("""INSERT INTO stationarylocations (unit_id, latitude, longitude, community) VALUES (%s, %s, %s, %s)""",(sensorname, lat, lon, community))
 
             except psycopg2.Error as e:
-                # No need to log duplicity errors
+                # No need to log the whole duplicity errors
                 if ("23505" not in e.pgcode):
                     debugMessage("An error occurred entering data into database. Details: '" + e.pgerror + "'")
                 else:
