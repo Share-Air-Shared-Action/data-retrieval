@@ -35,7 +35,7 @@ for result in data['results']:
     if (result['Label']):
         # If the label starts with SASA (or varied capitalization of it)
         if (result['Label'].upper().startswith("SASA")):
-            sensorname = result['Label'].replace(" ","").upper()
+            sensorname = result['Label'].replace(" ","").replace("-","_").upper()
             lat = result['Lat']
             lon = result['Lon']
             community = ''
