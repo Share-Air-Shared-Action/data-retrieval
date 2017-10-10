@@ -92,6 +92,9 @@ while d <= currentDate:
                     # Get the community from the 3rd spot between _
                     community = fixed_label.split("_")[2]
 
+                    # Make sure it is only two characters
+                    community = community[:2]
+
                 # The day to look at (current date in loop)
                 start_date = d
 
