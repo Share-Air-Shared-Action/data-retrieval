@@ -20,18 +20,17 @@
 # For more information see the manual pages of crontab(5) and cron(8)
 #
 # m h  dom mon dow   command
-30 20 * * * ./import-sql.sh
+
+# Metone
 3 0 * * * /data/sasa_airquality/metone/curlmetone.sh 12396 12397 12398
 10 0 * * * /data/sasa_airquality/metone/metoneload.sh
 
-3 0 * * * python /data/sasa_airquality/purpleair/newtool.py
-10 0 * * * /data/sasa_airquality/purpleair/purpleairload.sh
+# Purple Air
+3 0 * * * python /data/sasa_airquality/purpleair/purpleairtool.py
 3 0 * * * python /data/sasa_airquality/purpleair/stationarylocations.py
 
+# Airbeam/Terrier
 3 0 * * * python /data/sasa_airquality/airbeamterrier/airbeamterrier.py
 
-3 0 * * * /data/sasa_airquality/aeroqual/Little\ Village/load.sh
-
+# Triggers
 30 0 * * * psql -d sasa_airquality -f /data/sasa_airquality/triggers.sql
-
-#run all crontab operations from root 'postgres' user only
