@@ -48,6 +48,9 @@ for result in data['results']:
                 # Get the community from the 3rd spot between _
                 community = sensorname.split("_")[2]
 
+                # Make sure it is only two characters
+                community = community[:2]
+
             debugMessage("Entering sensor '" + sensorname + "' with lat: " + lat + " and with long: " + lon + " and with community " + community)
 
             # Connect to the database using keys.py
