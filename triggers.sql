@@ -49,6 +49,7 @@ update purpleairsecondary set season='Winter' where (created_at >= :winterStart 
 update metone set community='LV' where (time >= '2017-06-05 00:00:00-05' and time < '2017-07-01 00:00:00-05');
 update metone set community='SE' where (time >= '2017-07-01 00:00:00-00' and time < '2017-08-01 00:00:00-00');
 update metone set community='PC' where (time >= '2017-08-09 00:00:00-00' and time < '2017-08-31 00:00:00-00');
+update metone set community='NB' where (time >= '2017-10-06 00:00:00-00' and time < '2017-10-31 00:00:00-00');
 
 -- Set community on purpleairprimary table based on time ranges where the sensors were set up in the communities
 update purpleairprimary set community='LV' where (created_at < '2017-07-01 00:00:00-00');
@@ -71,3 +72,8 @@ update metone set type='pm10' where type='conc' and unit_id='SASA_MO3' and commu
 update metone set type='pm10' where type='conc' and unit_id='SASA_MO1' and community='PC';
 update metone set type='pm25' where type='conc' and unit_id='SASA_MO2' and community='PC';
 update metone set type='pm10' where type='conc' and unit_id='SASA_MO3' and community='PC';
+
+-- Set data type on metones for NB
+update metone set type='pm25' where type='conc' and unit_id='SASA_MO1' and community='NB';
+update metone set type='pm10' where type='conc' and unit_id='SASA_MO2' and community='NB';
+update metone set type='pm25' where type='conc' and unit_id='SASA_MO3' and community='NB';
