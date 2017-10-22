@@ -86,7 +86,7 @@ while d < currentDate:
                 community = ''
 
                 # If size is correct to contain a community
-                if (len(fixed_label) >= 10):
+                if (len(fixed_label) >= 11):
                     # Get the community from the 3rd spot between _
                     community = fixed_label.split("_")[2]
 

@@ -44,7 +44,7 @@ for result in data['results']:
             community = ''
 
             # If size is correct to contain a community
-            if (len(sensorname) >= 10):
+            if (len(sensorname) >= 11):
                 # Get the community from the 3rd spot between _
                 community = sensorname.split("_")[2]
 
