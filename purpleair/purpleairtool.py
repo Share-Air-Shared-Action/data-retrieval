@@ -30,7 +30,7 @@ except:
     sys.exit(-1000)
 
 # Set the URL of the JSON file
-JSONurl = 'https://map.purpleair.org/json'
+JSONurl = 'https://map.purpleair.org/json?inc=246035%7C246037%7C246039%7C246041%7C246044%7C246046%7C246049%7C246051%7C246058%7C246060%7C246063%7C246065%7C246070%7C246072%7C246087%7C246089%7C246094%7C246096%7C246114%7C246116'
 
 # Set the initial date
 initialDate = datetime.strptime("2017-03-20","%Y-%m-%d")
