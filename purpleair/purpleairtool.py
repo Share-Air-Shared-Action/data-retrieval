@@ -14,11 +14,23 @@ def debugMessage(message):
     log.flush()
     os.fsync(log.fileno())
 
+debugMessage("[" + str(datetime.now()) + "] Starting purpleair tool.")
+
+# Connect to the database
+try:
+    dbConnection = psycopg2.connect(host=keys.hostname, user=keys.username, password=keys.password, dbname=keys.database)
+    dbConnection.autocommit = True
+    dbCursor = dbConnection.cursor()
+
+except (KeyboardInterrupt, SystemExit):
+    debugMessage("[" + str(datetime.now()) + "] Received keyboard interrupt or other system exit signal. Quitting.")
+    sys.exit(-1)
+except:
+    debugMessage("[" + str(datetime.now()) + "] Error connecting to database...");
+    sys.exit(-1000)
+
 # Set the URL of the JSON file
 JSONurl = 'https://map.purpleair.org/json'
-
-# Set the download directory
-downloadDirectory = '/data/sasa_airquality/purpleair/downloads/'
 
 # Set the initial date
 initialDate = datetime.strptime("2017-03-20","%Y-%m-%d")
@@ -38,23 +50,9 @@ decoded_response = JSONresponse.decode('iso-8859-1').encode('utf8')
 # Parse the JSON
 JSONdata = json.loads(decoded_response)
 
-# Connect to the database
-try:
-    dbConnection = psycopg2.connect(host=keys.hostname, user=keys.username, password=keys.password, dbname=keys.database)
-    dbConnection.autocommit = True
-    dbCursor = dbConnection.cursor()
-
-except (KeyboardInterrupt, SystemExit):
-    sys.exit(-1)
-except:
-    debugMessage("Error connecting to database...");
-    sys.exit(-1000)
-
-debugMessage("Starting purpleair tool.")
-
 # For each date since the initial date
 d = initialDate
-while d <= currentDate:
+while d < currentDate:
 
     dString = d.strftime("%Y-%m-%d")
 
@@ -63,11 +61,11 @@ while d <= currentDate:
 
     # This skips the current loop if the date has run before
     if (dbCursor.fetchone() is not None):
-        debugMessage("Skipping date '" + dString + "' as it has run before.")
+        debugMessage("[" + str(datetime.now()) + "] Skipping date '" + dString + "' as it has run before.")
         d += delta
         continue
 
-    debugMessage("Running for date '" + dString + "'")
+    debugMessage("[" + str(datetime.now()) + "] Running for date '" + dString + "'")
 
     # For each "result" in the JSON
     for result in JSONdata['results']:
@@ -78,7 +76,7 @@ while d <= currentDate:
             # If the label starts with SASA
             if (fixed_label).startswith("SASA"):
 
-                debugMessage("Requesting data for '" + fixed_label + "' during the date '" + dString + "'")
+                debugMessage("[" + str(datetime.now()) + "] Requesting data for '" + fixed_label + "' during the date '" + dString + "'")
 
                 # Get the API endpoint ID and key
                 thingspeak_id = result['THINGSPEAK_PRIMARY_ID']
@@ -104,15 +102,14 @@ while d <= currentDate:
                 try:
                     CSVurl = "https://thingspeak.com/channels/" + thingspeak_id + "/feed.csv?api_key=" + thingspeak_apikey + "&offset=0&average=&round=2&start=" + start_date.strftime("%Y-%m-%d") + "&end=" + end_date.strftime("%Y-%m-%d")
 
-                    # debugMessage(CSVurl)
-
                     CSVresponse = urllib.urlopen(CSVurl).read()
                     CSVdata = csv.reader(StringIO.StringIO(CSVresponse), delimiter=',')
 
                 except (KeyboardInterrupt, SystemExit):
+                    debugMessage("[" + str(datetime.now()) + "] Received keyboard interrupt or other system exit signal. Quitting.")
                     sys.exit(-1)
                 except:
-                    debugMessage("WARNING: Error downloading or parsing CSV for '" + fixed_label + "' during the date (" + d.strftime("%Y-%m-%d") + "). Skipping.")
+                    debugMessage("[" + str(datetime.now()) + "] WARNING: Error downloading or parsing CSV for '" + fixed_label + "' during the date (" + d.strftime("%Y-%m-%d") + "). Skipping.")
                     continue
 
                 # Skip the header by using this variable
@@ -148,6 +145,7 @@ while d <= currentDate:
                         try:
                             dbCursor.execute("INSERT INTO purpleairprimary (created_at, entry_id, pm1_cf_atm_ugm3, pm25_cf_atm_ugm3, pm10_cf_atm_ugm3, uptimeminutes, rssi_dbm, temperature_f, humidity_percent, pm25_cf_1_ugm3, device_name, community) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",(row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9], fixed_label, community))
                         except (KeyboardInterrupt, SystemExit):
+                            debugMessage("[" + str(datetime.now()) + "] Received keyboard interrupt or other system exit signal. Quitting.")
                             sys.exit(-1)
                         except psycopg2.Error as e:
                             # No need to log duplicity errors
