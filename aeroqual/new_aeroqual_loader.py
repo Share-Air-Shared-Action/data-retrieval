@@ -30,7 +30,7 @@ except:
 
 
 # Set the names of the communities (subfolders)
-communities = ["Altgeld Gardens", "Little Village", "South East Environmental Task Force", "South Loop"]
+communities = ["Altgeld Gardens", "Little Village", "South East Environmental Task Force", "South Loop", "Northbrook"]
 
 # For each community
 for community in communities:
@@ -41,8 +41,10 @@ for community in communities:
         communityAbbreviation = "LV"
     elif (community == "South East Environmental Task Force"):
         communityAbbreviation = "SE"
-#    elif (community == "South Loop"):
-#        communityAbbreviation = ""
+    elif (community == "South Loop"):
+        communityAbbreviation = "SL"
+    elif (community == "Northbrook"):
+        communityAbbreviation = "NB"
     else:
         communityAbbreviation = ""
 
