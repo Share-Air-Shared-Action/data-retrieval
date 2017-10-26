@@ -63,6 +63,10 @@ update metone set error='1' where value > 1000 and (type='conc' or type='pm25' o
 update purpleairprimary set error='1' where pm1_cf_atm_ugm3 > 1000 or pm25_cf_atm_ugm3 > 1000 or pm10_cf_atm_ugm3 > 1000;
 update airterrier set error='1' where measurement_type = 'Particulate Matter' and measured_value > 1000;
 
+-- Check for lines where lat/long not set (airterrier)
+update airterrier set error='1' where latitude = 0;
+update airterrier set error='1' where longitude = 0;
+
 -- Set data type on metones for LV
 update metone set type='pm25' where type='conc' and unit_id='SASA_MO1' and community='LV';
 update metone set type='pm25' where type='conc' and unit_id='SASA_MO2' and community='LV';
