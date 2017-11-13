@@ -98,6 +98,16 @@ for community in communities:
                         # The rest of the rows should contain data, so enter it into database
 
                         try:
+                            # Psycopg2 throws an error on empty strings in non string fields, so make NULL instead
+                            if (not row[0]):
+                                row[0] = None
+                            if (not row[1]):
+                                row[1] = None
+                            if (not row[2]):
+                                row[2] = None
+                            if (not row[3]):
+                                row[3] = None
+
                             dbCursor.execute("INSERT INTO " + dbtable + " (date, monitorid, locationid, " + dbcolumn + ", unit_id, community) VALUES (%s, %s, %s, %s, %s, %s)", (row[0], row[1], row[2], row[3], unit_id, communityAbbreviation))
                         except psycopg2.Error as e:
                             # Log everything but duplicity errors

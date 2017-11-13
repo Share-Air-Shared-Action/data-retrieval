@@ -31,5 +31,8 @@
 # Airbeam/Terrier
 3 0 * * * python /data/sasa_airquality/airbeamterrier/airbeamterrier.py
 
+# Aeroqual
+3 0 * * * python /data/sasa_airquality/aeroqual/new_aeroqual_loader.py
+
 # Triggers
 30 0 * * * psql -d sasa_airquality -f /data/sasa_airquality/triggers.sql
