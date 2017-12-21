@@ -36,3 +36,6 @@
 
 # Triggers
 30 0 * * * psql -d sasa_airquality -f /data/sasa_airquality/triggers.sql
+
+# Collect weather every 15 minutes
+*/15 * * * * python /data/sasa_airquality/weather/weather.py
