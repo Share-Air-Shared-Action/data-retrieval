@@ -1,0 +1,23 @@
+CREATE TABLE wundergound (
+    observation_time timestamptz UNIQUE NOT NULL,
+    temp_f double precision,
+    relative_humidity double precision,
+    wind_dir text,
+    wind_degrees double precision,
+    wind_mph double precision,
+    wind_gust_mph double precision,
+    pressure_in double precision,
+    pressure_trend char,
+    dewpoint_f double precision,
+    heat_index_f double precision,
+    windchill_f double precision,
+    feelslike_f double precision,
+    visibility_mi double precision,
+    solarradiation double precision,
+    UV double precision,
+    precip_1hr_in double precision,
+    precip_today_in double precision,
+    observation_lat float,
+    observation_lng float,
+    community varchar(2)
+);
