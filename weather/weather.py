@@ -15,6 +15,13 @@ def debugMessage(message):
     logfile.flush()
     os.fsync(logfile.fileno())
 
+# Create a function for cleaning data before entering into database
+def cleanData(data):
+    if ((data == "NA") or (data == "") or (data == "--")):
+        return None
+    else:
+        return data
+
 # Set the communities as a dictionary. Will put the center lat/long as a tuple for each key
 communities = {"LV" : None, "PC" : None, "SL" : None, "SE" : None, "NB" : None}
 
@@ -87,31 +94,26 @@ for key, value in communities.iteritems():
     conditionsData = json.loads(conditionsResponse)
 
     # Get the relevant weather data
-    observation_time = conditionsData["current_observation"]["observation_time_rfc822"]
-    temp_f = conditionsData["current_observation"]["temp_f"]
-    relative_humidity = conditionsData["current_observation"]["relative_humidity"].rstrip("%")
-    wind_dir = conditionsData["current_observation"]["wind_dir"]
-    wind_degrees = conditionsData["current_observation"]["wind_degrees"]
-    wind_mph = conditionsData["current_observation"]["wind_mph"]
-    wind_gust_mph = conditionsData["current_observation"]["wind_gust_mph"]
-    pressure_in = conditionsData["current_observation"]["pressure_in"]
-    pressure_trend = conditionsData["current_observation"]["pressure_trend"]
-    dewpoint_f = conditionsData["current_observation"]["dewpoint_f"]
-    heat_index_f = conditionsData["current_observation"]["heat_index_f"]
-    if (heat_index_f == "NA"):
-        heat_index_f = None
-    windchill_f = conditionsData["current_observation"]["windchill_f"]
-    feelslike_f = conditionsData["current_observation"]["feelslike_f"]
-    visibility_mi = conditionsData["current_observation"]["visibility_mi"]
-    solarradiation = conditionsData["current_observation"]["solarradiation"]
-    if (solarradiation == "--"):
-        solarradiation = None
-    UV = conditionsData["current_observation"]["UV"]
-    precip_1hr_in = conditionsData["current_observation"]["precip_1hr_in"]
-    precip_today_in = conditionsData["current_observation"]["precip_today_in"]
-
-    observation_lat = conditionsData["current_observation"]["observation_location"]["latitude"]
-    observation_lng = conditionsData["current_observation"]["observation_location"]["longitude"]
+    observation_time = cleanData(conditionsData["current_observation"]["observation_time_rfc822"])
+    temp_f = cleanData(conditionsData["current_observation"]["temp_f"])
+    relative_humidity = cleanData(conditionsData["current_observation"]["relative_humidity"].rstrip("%"))
+    wind_dir = cleanData(conditionsData["current_observation"]["wind_dir"])
+    wind_degrees = cleanData(conditionsData["current_observation"]["wind_degrees"])
+    wind_mph = cleanData(conditionsData["current_observation"]["wind_mph"])
+    wind_gust_mph = cleanData(conditionsData["current_observation"]["wind_gust_mph"])
+    pressure_in = cleanData(conditionsData["current_observation"]["pressure_in"])
+    pressure_trend = cleanData(conditionsData["current_observation"]["pressure_trend"])
+    dewpoint_f = cleanData(conditionsData["current_observation"]["dewpoint_f"])
+    heat_index_f = cleanData(conditionsData["current_observation"]["heat_index_f"])
+    windchill_f = cleanData(conditionsData["current_observation"]["windchill_f"])
+    feelslike_f = cleanData(conditionsData["current_observation"]["feelslike_f"])
+    visibility_mi = cleanData(conditionsData["current_observation"]["visibility_mi"])
+    solarradiation = cleanData(conditionsData["current_observation"]["solarradiation"])
+    UV = cleanData(conditionsData["current_observation"]["UV"])
+    precip_1hr_in = cleanData(conditionsData["current_observation"]["precip_1hr_in"])
+    precip_today_in = cleanData(conditionsData["current_observation"]["precip_today_in"])
+    observation_lat = cleanData(conditionsData["current_observation"]["observation_location"]["latitude"])
+    observation_lng = cleanData(conditionsData["current_observation"]["observation_location"]["longitude"])
 
     # Put the data into database:
     try:
