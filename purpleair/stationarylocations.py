@@ -51,7 +51,7 @@ for result in data['results']:
                 # Make sure it is only two characters
                 community = community[:2]
 
-            debugMessage("Entering sensor '" + sensorname + "' with lat: " + lat + " and with long: " + lon + " and with community " + community)
+            debugMessage("Entering sensor '" + sensorname + "' with lat: " + str(lat) + " and with long: " + str(lon) + " and with community " + community)
 
             # Connect to the database using keys.py
             try:
