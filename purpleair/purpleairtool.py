@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import keys
 
 # Open the log file
-log = open("/data/sasa_airquality/airbeamterrier/logs/airbeamterrier.log", "a+")
+log = open("/data/sasa_airquality/purpleair/logs/purpleair.log", "a+")
 
 # Create a function for logging/displaying output
 def debugMessage(message):
