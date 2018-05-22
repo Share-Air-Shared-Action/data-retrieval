@@ -51,15 +51,22 @@ def unix_time_millis(dt):
 
 # For each date since the initial date
 d = initialDate
+
+# Check if the date has run before
+dbCursor.execute("SELECT date FROM metonedone group by date")
+
+allDates = {}
+
+# store already fetched dates to dictionary
+for record in dbCursor:
+    allDates[record[0].strftime("%Y-%m-%d")] = 1
+
 while d < currentDate:
 
     dString = d.strftime("%Y-%m-%d")
 
-    # Check if the date has run before
-    dbCursor.execute("SELECT date FROM metonedone where date = %s",(dString,))
-
     # This skips the current loop if the date has run before
-    if (dbCursor.fetchone() is not None):
+    if (dString in allDates):
         debugMessage("[" + str(datetime.now()) + "] Skipping date '" + dString + "' as it has run before.")
         d += delta
         continue
