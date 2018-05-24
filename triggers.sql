@@ -19,7 +19,10 @@
 update aeroqualno2 set season='Pilot'  where (date >= :pilotStart and date < :pilotEnd) and season is null;
 update aeroqualno2 set season='Summer' where (date >= :summerStart and date < :summerEnd) and season is null;
 update aeroqualno2 set season='Winter' where (date >= :winterStart and date < :winterEnd) and season is null;
+<<<<<<< HEAD
 update aeroqualno2 set season='On-going' where (date >= :onGoingStart) and season is null;
+=======
+>>>>>>> 7fda3d9636d2baa2e0edf9af847f88c78d6c7427
 
 -- Set season based on date on metone table
 update metone set season='Pilot' where (time >= :pilotStart and time < :pilotEnd) and season is null;
