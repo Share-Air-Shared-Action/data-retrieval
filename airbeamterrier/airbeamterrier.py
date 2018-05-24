@@ -25,7 +25,7 @@ def debugMessage(message):
 
 # Set the "usernames" for the API call
 # These may be changed if they add a new phone
-usernames = ["PCR SASA_ABAG1", "PCR SASA_ABAG2", "PCR SASA_ABAG4", "PCR SASA_ABAG6", "PCR SASA_ABAG8", "SASA_AB1", "SASA_AB2", "SASA_AB3", "SASA_AB4", "SASA_AB5", "SASA_AB6", "SASA_AB7", "SASA_AB8", "SASA_AB9","SASA_ABSL1", "SASA_ABSL3","SASA_ABSL6","SASA_ABSL7","SASA_ABSL8","SASA_ABSL4"]
+usernames = ["UCAir","setaskforce","SASA_SE4","setasforce7","SASA_NB1","PCR SASA_ABAG1", "PCR SASA_ABAG2", "PCR SASA_ABAG4", "PCR SASA_ABAG6", "PCR SASA_ABAG8", "SASA_AB1", "SASA_AB2", "SASA_AB3", "SASA_AB4", "SASA_AB5", "SASA_AB6", "SASA_AB7", "SASA_AB8", "SASA_AB9","SASA_ABSL1", "SASA_ABSL3","SASA_ABSL6","SASA_ABSL7","SASA_ABSL8","SASA_ABSL4"]
 
 # Set the timezone
 tz = pytz.timezone("America/Chicago")
