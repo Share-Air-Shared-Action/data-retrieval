@@ -19,35 +19,37 @@
 update aeroqualno2 set season='Pilot'  where (date >= :pilotStart and date < :pilotEnd) and season is null;
 update aeroqualno2 set season='Summer' where (date >= :summerStart and date < :summerEnd) and season is null;
 update aeroqualno2 set season='Winter' where (date >= :winterStart and date < :winterEnd) and season is null;
-<<<<<<< HEAD
 update aeroqualno2 set season='On-going' where (date >= :onGoingStart) and season is null;
-=======
->>>>>>> 7fda3d9636d2baa2e0edf9af847f88c78d6c7427
 
 -- Set season based on date on metone table
 update metone set season='Pilot' where (time >= :pilotStart and time < :pilotEnd) and season is null;
 update metone set season='Summer' where (time >= :summerStart and time < :summerEnd) and season is null;
 update metone set season='Winter' where (time >= :winterStart and time < :winterEnd) and season is null;
+update metone set season='On-going' where (time >= :onGoingStart) and season is null;
 
 -- Set season based on date on airterrier table
 update airterrier set season='Pilot' where (time >= :pilotStart and time < :pilotEnd) and season is null;
 update airterrier set season='Summer' where (time >= :summerStart and time < :summerEnd) and season is null;
 update airterrier set season='Winter' where (time >= :winterStart and time < :winterEnd) and season is null;
+update airterrier set season='On-going' where (time >= :onGoingStart) and season is null;
 
 -- Set season based on date on aeroqualo3 table
 update aeroqualo3 set season='Pilot' where (date >= :pilotStart and date < :pilotEnd) and season is null;
 update aeroqualo3 set season='Summer' where (date >= :summerStart and date < :summerEnd) and season is null;
 update aeroqualo3 set season='Winter' where (date >= :winterStart and date < :winterEnd) and season is null;
+update aeroqualo3 set season='On-going' where (date >= :onGoingStart) and season is null;
 
 -- Set season based on date on purpleairprimary table
 update purpleairprimary set season= 'Pilot' where (created_at >= :pilotStart and created_at < :pilotEnd) and season is null;
 update purpleairprimary set season= 'Summer'  where (created_at >= :summerStart and  created_at < :summerEnd) and season is null;
 update purpleairprimary set season= 'Winter' where (created_at >= :winterStart and created_at < :winterEnd) and season is null;
+update purpleairprimary set season='On-going' where (created_at >= :onGoingStart) and season is null;
 
 -- Set season based on date on purpleairsecondary table
 update purpleairsecondary set season='Pilot' where (created_at >= :pilotStart and created_at < :pilotEnd) and season is null;
 update purpleairsecondary set season='Summer' where (created_at >= :summerStart and  created_at < :summerEnd) and season is null;
 update purpleairsecondary set season='Winter' where (created_at >= :winterStart and created_at < :winterEnd) and season is null;
+update purpleairsecondary set season='On-going' where (created_at >= :onGoingStart) and season is null;
 
 ---------------------------------- Set the communities in this section ----------------------------------
 
@@ -91,3 +93,4 @@ update metone set type='pm25' where type='conc' and unit_id='SASA_MO3' and commu
 
 -- Set data type on metones for SL
 update metone set type='pm10' where type='conc' and unit_id='SASA_MO1' and community='SL' and type<>'pm10';
+
