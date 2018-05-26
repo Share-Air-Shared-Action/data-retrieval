@@ -54,16 +54,16 @@ update purpleairsecondary set season='On-going' where (created_at >= :onGoingSta
 ---------------------------------- Set the communities in this section ----------------------------------
 
 -- Set community on metone table based on time ranges where the sensors were set up in the communities
-update metone set community='LV' where (time >= '2017-06-05 00:00:00-05' and time < '2017-07-01 00:00:00-05') and community is null;
-update metone set community='SE' where (time >= '2017-07-01 00:00:00-00' and time < '2017-08-01 00:00:00-00') and community is null;
-update metone set community='PC' where (time >= '2017-08-09 00:00:00-00' and time < '2017-08-31 00:00:00-00') and community is null;
-update metone set community='SL' where (time >= '2017-09-11 00:00:00-00' and time < '2017-10-03 00:00:00-00') and community is null;
-update metone set community='NB' where (time >= '2017-10-06 00:00:00-00' and time < '2017-10-31 00:00:00-00') and community is null;
+update metone set community='LV' where (time >= '2017-06-05 00:00:00-05' and time < '2017-07-01 00:00:00-05') and community != 'LV';
+update metone set community='SE' where (time >= '2017-07-01 00:00:00-00' and time < '2017-08-01 00:00:00-00') and community != 'SE';
+update metone set community='PC' where (time >= '2017-08-09 00:00:00-00' and time < '2017-08-31 00:00:00-00') and community != 'PC';
+update metone set community='SL' where (time >= '2017-09-11 00:00:00-00' and time < '2017-10-03 00:00:00-00') and community != 'SL';
+update metone set community='NB' where (time >= '2017-10-06 00:00:00-00' and time < '2017-10-31 00:00:00-00') and community != 'NB';
 
 -- Set community on purpleairprimary table based on time ranges where the sensors were set up in the communities
-update purpleairprimary set community='LV' where (created_at < '2017-07-01 00:00:00-00') and community is null;
-update purpleairprimary set community='SE' where (created_at >= '2017-07-01 00:00:00-00' and created_at <= '2017-08-01 00:00:00-00') and community is null;
-update purpleairprimary set community='PC' where (created_at >= '2017-08-09 00:00:00-00' and created_at < '2017-08-31 00:00:00-00') and community is null;
+update purpleairprimary set community='LV' where (created_at < '2017-07-01 00:00:00-00') and community != 'LV';
+update purpleairprimary set community='SE' where (created_at >= '2017-07-01 00:00:00-00' and created_at <= '2017-08-01 00:00:00-00') and community != 'SE';
+update purpleairprimary set community='PC' where (created_at >= '2017-08-09 00:00:00-00' and created_at < '2017-08-31 00:00:00-00') and community != 'PC';
 
 ---------------------------------- Set anything else in this section ----------------------------------
 
@@ -94,3 +94,6 @@ update metone set type='pm25' where type='conc' and unit_id='SASA_MO3' and commu
 -- Set data type on metones for SL
 update metone set type='pm10' where type='conc' and unit_id='SASA_MO1' and community='SL' and type<>'pm10';
 
+-- Check errors for questionable data in purpleairprimary
+update purpleairprimary set error=1 where community='NB' and to_char(created_at,'YYYY')='2018' and error is distinct from 1;
+update purpleairprimary set error=1 where device_name in (select device_name from (select count(*) cnt,device_name from purpleairprimary where to_char(created_at, 'YYYY-MM') = '2017-12' group by device_name) tb where cnt<200) and to_char(created_at, 'YYYY-MM') = '2017-12' and error is distinct from 1;
