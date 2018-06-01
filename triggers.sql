@@ -97,3 +97,9 @@ update metone set type='pm10' where type='conc' and unit_id='SASA_MO1' and commu
 -- Check errors for questionable data in purpleairprimary
 update purpleairprimary set error=1 where community='NB' and to_char(created_at,'YYYY')='2018' and error is distinct from 1;
 update purpleairprimary set error=1 where device_name in (select device_name from (select count(*) cnt,device_name from purpleairprimary where to_char(created_at, 'YYYY-MM') = '2017-12' group by device_name) tb where cnt<200) and to_char(created_at, 'YYYY-MM') = '2017-12' and error is distinct from 1;
+
+
+
+---Check for runs in Airterrier table that are less than a minute and remove 
+UPDATE airterrier SET error=1 WHERE session_title IN (select session_title from airterrier group by session_title having EXTRACT(EPOCH FROM (max(time) - min(time))) < 60 ) and error is distinct from 1;
+
