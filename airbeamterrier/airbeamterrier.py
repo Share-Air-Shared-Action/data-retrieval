@@ -117,7 +117,7 @@ while d <= currentDate:
                         average_value = streamdata['average_value']
                         sensor_package_name = streamdata['sensor_package_name']
                         unit_name = streamdata['unit_name']
-
+                        sensor_name = streamdata['sensor_name']
                         measurementCount = 1
 
                         debugMessage("[" + str(datetime.now()) + "] Found " + str((streamdata['size'])) + " records in this stream.")
@@ -142,8 +142,8 @@ while d <= currentDate:
                             measured_value = measurement['value']
 
                             try:
-                                dbCursor.execute("""INSERT INTO airterrier (session_title, username, average_value, measurement_type, sensor_package_name, unit_name, latitude, longitude, measured_value, time)
-                                                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",(session_title, username, average_value, measurement_type, sensor_package_name, unit_name, latitude, longitude, measured_value, time))
+                                dbCursor.execute("""INSERT INTO airterrier (session_title, username, average_value, measurement_type, sensor_name, sensor_package_name, unit_name, latitude, longitude, measured_value, time)
+                                                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",(session_title, username, average_value, measurement_type, sensor_name, sensor_package_name, unit_name, latitude, longitude, measured_value, time))
                             except (KeyboardInterrupt, SystemExit):
                                 debugMessage("[" + str(datetime.now()) + "] Received keyboard interrupt or other system exit signal. Quitting.")
                                 sys.exit(-1)
