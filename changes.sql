@@ -68,10 +68,21 @@ update airterrier set session_title='SL3_0423PM' where session_title='sl3_042318
 update airterrier set session_title='SL3_0425AMT' where session_title='sl3_0425amt2';
 update airterrier set session_title='SL5_0411AM' where session_title='SL5_0411AMTEST';
 update airterrier set session_title='SL5_0416PM' where session_title='SL5_041618PM';
+update airterrier set session_title='SL2_0922AMT' where session_title='sl2_0922_am-t';
+update airterrier set session_title='SL4_0911AM' where session_title='SL4B_0911AM';
+update airterrier set session_title='SL3_0918PM' where session_title='SLR30918PM Session 1';
+update airterrier set session_title='SL2_0425AMT' where session_title='SL2_0425_AMT';
+update airterrier set session_title='SL4_0925PMT' where session_title='SL_40925PMT';
+update airterrier set session_title='SL3_0919AM' where session_title='sL3_0919AM(part 1)' or session_title='SL3_0919AM(part2)';
+--For LV community
+update airterrier set session_title='LV2_0621AMT' where session_title='LV2_0621AM(2)';
+update airterrier set session_title='LV0_0418PM' where session_title='LVKW_0418PM';
+update airterrier set session_title='LV03_0314PM' where session_title='LV3_0314PM';
 --For PC Community
 update airterrier set session_title='PC00_0228AM' where session_title='pcc feb28';
 update airterrier set session_title='PC9_0504PMT' where session_title='pc9_0504pmt2';
 update airterrier set session_title='PC9_0504PMT' where session_title='pc9_0504pmt3';
+update airterrier set session_title='PC4_0830AM' where session_title='pc4_0830_am';
 
 
 -- Fix Purple Air that wasn't re-registered
