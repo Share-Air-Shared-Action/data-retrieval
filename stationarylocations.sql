@@ -22,3 +22,7 @@ INSERT INTO stationarylocations(unit_id,latitude,longitude,address,dateinstalled
 INSERT INTO stationarylocations(unit_id,latitude,longitude,address,dateinstalled,community) VALUES('SASA_PA4B',41.843557,-87.732057,'2616 S. Kildaire', to_date('2017-04-15','YYYY-MM-DD')    ,'LV');
 INSERT INTO stationarylocations(unit_id,latitude,longitude,address,dateinstalled,community) VALUES('SASA_PA5B',41.84962,-87.703686,'2311 S. Troy', to_date('2017-04-17','YYYY-MM-DD')    ,'LV');
 INSERT INTO stationarylocations(unit_id,latitude,longitude,address,dateinstalled,community) VALUES('SASA_PA2B',41.842145,-87.724138,'2707 S. Pulaski',to_date('2017-04-17','YYYY-MM-DD'),'LV');
+INSERT INTO stationarylocations(unit_id,latitude,longitude,community) VALUES ('SASA_PA10_SL_SB',41.868884,-87.629213,'SL');
+INSERT INTO stationarylocations(unit_id,latitude,longitude,community) VALUES ('SASA_PA13_SL_SB',41.867463,-87.627174,'SL');
+INSERT INTO stationarylocations(unit_id,latitude,longitude,community) VALUES ('SASA_PA15_SL_SB',41.868808,-87.629388,'SL');
+INSERT INTO stationarylocations(unit_id,latitude,longitude,community) VALUES ('SASA_PA16_SL_SB',41.864197,-87.630135,'SL');
