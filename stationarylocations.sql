@@ -26,3 +26,11 @@ INSERT INTO stationarylocations(unit_id,latitude,longitude,community) VALUES ('S
 INSERT INTO stationarylocations(unit_id,latitude,longitude,community) VALUES ('SASA_PA13_SL_SB',41.867463,-87.627174,'SL');
 INSERT INTO stationarylocations(unit_id,latitude,longitude,community) VALUES ('SASA_PA15_SL_SB',41.868808,-87.629388,'SL');
 INSERT INTO stationarylocations(unit_id,latitude,longitude,community) VALUES ('SASA_PA16_SL_SB',41.864197,-87.630135,'SL');
+-- removing incorrect two stationary locations for SASA_PA2 and SASA_PA2B and inserting with the correct latlong location
+delete from stationarylocations where unit_id='SASA_PA2B' or unit_id='SASA_PA2';
+insert into stationarylocations(unit_id,latitude,longitude,community) values('SASA_PA2',41.84061,-87.734597,'LV');
+insert into stationarylocations(unit_id,latitude,longitude,community) values('SASA_PA2B',41.84061,-87.734597,'LV');
+insert into stationarylocations(unit_id,latitude,longitude,community) values('SASA_PA7',41.850941,-87.684403,'LV');
+insert into stationarylocations(unit_id,latitude,longitude,community) values('SASA_PA7B',41.850941,-87.684403,'LV');
+insert into stationarylocations(unit_id,latitude,longitude,community) values('SASA_PA8',41.849809,-87.696619,'LV');
+insert into stationarylocations(unit_id,latitude,longitude,community) values('SASA_PA8B',41.849809,-87.696619,'LV');

@@ -96,77 +96,88 @@ insert into purpleair_nb select * from purpleairsecondary where community='NB';
 insert into purpleair_pc select * from purpleairsecondary where community='PC';
 insert into purpleair_lv select * from purpleairsecondary where community='LV';
 
+create index on purpleair(community,season,device_name);
+
 -- functions
 -- List of unique sensors
 -- '{"SASA_PA10","SASA_PA10_PC_S","SASA_PA10_SL_S","SASA_PA13_SL_S","SASA_PA14_NB","SASA_PA15_SL_S","SASA_PA16_NB","SASA_PA16_SL_S","SASA_PA1_LV_W","SASA_PA1_PC_S","SASA_PA1_PC_W","SASA_PA2","SASA_PA2_LV_S","SASA_PA2_LV_W","SASA_PA2_PC_S","SASA_PA2_SE_S2","SASA_PA2_SL_W","SASA_PA3","SASA_PA3_LV_S","SASA_PA3_LV_W","SASA_PA3_PC_S","SASA_PA3_SL_S","SASA_PA3_SL_W","SASA_PA4","SASA_PA4_LV_S","SASA_PA4_LV_W","SASA_PA4_SL_W","SASA_PA5","SASA_PA5_LV_S","SASA_PA5_LV_W","SASA_PA5_SL_W","SASA_PA6","SASA_PA6_LV_S","SASA_PA6_LV_W","SASA_PA6_NB","SASA_PA6_SE_S6","SASA_PA6_SL_S","SASA_PA6_SL_W","SASA_PA7","SASA_PA7_LV_S","SASA_PA7_LV_W","SASA_PA7_SE_S3","SASA_PA7_SE_W","SASA_PA8","SASA_PA8_LV_S","SASA_PA9","SASA_PA9_NB","SASA_PA9_SE_S4"}'
 CREATE OR REPLACE FUNCTION clean_purpleairprimary() RETURNS void AS $$
-DECLARE
-devices_sl varchar[]:= '{"SASA_PA10_SL_S","SASA_PA13_SL_S","SASA_PA2_SL_W","SASA_PA3_SL_S","SASA_PA3_SL_W","SASA_PA4_SL_W","SASA_PA6_SL_S","SASA_PA6_SL_W","SASA_PA15_SL_S","SASA_PA16_SL_S","SASA_PA10","SASA_PA2","SASA_PA3","SASA_PA4","SASA_PA5","SASA_PA6","SASA_PA7","SASA_PA8","SASA_PA9"}';
-devices_pc varchar[]:= '{"SASA_PA10_PC_S","SASA_PA1_PC_S","SASA_PA1_PC_W","SASA_PA2_PC_S","SASA_PA3_PC_S"}';
-devices_nb varchar[]:= '{"SASA_PA14_NB","SASA_PA16_NB","SASA_PA6_NB","SASA_PA9_NB"}';
-devices_lv varchar[]:= '{"SASA_PA1_LV_W","SASA_PA2_LV_W","SASA_PA3_LV_S","SASA_PA3_LV_W","SASA_PA5_LV_S","SASA_PA5_LV_W","SASA_PA6_LV_S","SASA_PA6_LV_W","SASA_PA7_LV_S","SASA_PA7_LV_W","SASA_PA8_LV_S","SASA_PA4_LV_S","SASA_PA4_LV_W","SASA_PA2_LV_S"}';
-devices_se varchar[]:= '{"SASA_PA2_SE_S2","SASA_PA5_SL_W","SASA_PA7_SE_S3","SASA_PA7_SE_W","SASA_PA9_SE_S4","SASA_PA6_SE_S6"}';
-name varchar;
-eminute record;
-begin
+  DECLARE
+  devices_sl varchar[]:= '{"SASA_PA10_SL_S","SASA_PA13_SL_S","SASA_PA2_SL_W","SASA_PA3_SL_S","SASA_PA3_SL_W","SASA_PA4_SL_W","SASA_PA6_SL_S","SASA_PA6_SL_W","SASA_PA15_SL_S","SASA_PA16_SL_S","SASA_PA10","SASA_PA2","SASA_PA3","SASA_PA4","SASA_PA5","SASA_PA6","SASA_PA7","SASA_PA8","SASA_PA9"}';
+  devices_pc varchar[]:= '{"SASA_PA10_PC_S","SASA_PA1_PC_S","SASA_PA1_PC_W","SASA_PA2_PC_S","SASA_PA3_PC_S"}';
+  devices_nb varchar[]:= '{"SASA_PA14_NB","SASA_PA16_NB","SASA_PA6_NB","SASA_PA9_NB"}';
+  devices_lv varchar[]:= '{"SASA_PA1_LV_W","SASA_PA2_LV_W","SASA_PA3_LV_S","SASA_PA3_LV_W","SASA_PA5_LV_S","SASA_PA5_LV_W","SASA_PA6_LV_S","SASA_PA6_LV_W","SASA_PA7_LV_S","SASA_PA7_LV_W","SASA_PA8_LV_S","SASA_PA4_LV_S","SASA_PA4_LV_W","SASA_PA2_LV_S"}';
+  devices_se varchar[]:= '{"SASA_PA2_SE_S2","SASA_PA5_SL_W","SASA_PA7_SE_S3","SASA_PA7_SE_W","SASA_PA9_SE_S4","SASA_PA6_SE_S6"}';
+  name varchar;
+  eminute record;
+  begin
 
--- cleaning sl data
-foreach name in array devices_sl loop
-	for eminute in select at2.minutes as val from (select att.minutes, case when sensora>1000 OR sensorb>1000 OR sensora=0 or sensorb=0 or (abs(sensora - sensorb)>=4 AND (sensora/sensorb >= 2 OR sensorb/sensora >= 2) ) then 'true' else 'false' end as can_update from (select sensora.minutes,coalesce(sensora.avg, 0) sensora,coalesce(sensorb.avg, 0) sensorb from
-	(select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 5 * interval '5 min' AS minutes,avg(pm25_cf_atm_ugm3) avg from purpleair_sl where device_name=name and error is distinct from 1 and created_at > '2017-06-05 00:00:00-05' group by 1) sensora full join
-	(select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 5 * interval '5 min' AS minutes,avg(pm25_cf_atm_ugm3) avg from purpleair_sl where device_name=name||'B'	and error is distinct from 1 and created_at > '2017-06-05 00:00:00-05' group by 1) sensorb on sensora.minutes=sensorb.minutes) att) at2 where can_update='true' loop
-		update purpleair_sl set error='1' where created_at > eminute.val and created_at < eminute.val + interval '5 minutes' and device_name=name or device_name=name||'B';
-		INSERT INTO purpleairprimary_log (device_name, start_time, end_time, rows_affected, log_time)
-		select device_name, eminute.val, eminute.val + interval '5 minutes', count(*), current_timestamp from purpleair_sl where created_at > eminute.val and created_at < eminute.val + interval '5 minutes' and device_name=name or device_name=name||'B' group by device_name;
-	end loop;
-end loop;
+  -- cleaning sl data
+  foreach name in array devices_sl loop
+  	for eminute in select at2.minutes as val from (select att.minutes, case when sensora>1000 OR sensorb>1000 OR sensora=0 or sensorb=0 or (abs(sensora - sensorb)>=4 AND (sensora/sensorb >= 2 OR sensorb/sensora >= 2) ) then 'true' else 'false' end as can_update from (select sensora.minutes,coalesce(sensora.avg, 0) sensora,coalesce(sensorb.avg, 0) sensorb from
+  	(select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 5 * interval '5 min' AS minutes,avg(pm25_cf_atm_ugm3) avg from purpleair_sl where device_name=name and error is distinct from 1 and created_at > '2017-06-05 00:00:00-05' group by 1) sensora full join
+  	(select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 5 * interval '5 min' AS minutes,avg(pm25_cf_atm_ugm3) avg from purpleair_sl where device_name=name||'B'	and error is distinct from 1 and created_at > '2017-06-05 00:00:00-05' group by 1) sensorb on sensora.minutes=sensorb.minutes) att) at2 where can_update='true' loop
+  		update purpleair_sl set error='1' where created_at > eminute.val and created_at < eminute.val + interval '5 minutes' and device_name=name or device_name=name||'B';
+  		INSERT INTO purpleairprimary_log (device_name, start_time, end_time, rows_affected, log_time)
+  		select device_name, eminute.val, eminute.val + interval '5 minutes', count(*), current_timestamp from purpleair_sl where created_at > eminute.val and created_at < eminute.val + interval '5 minutes' and device_name=name or device_name=name||'B' group by device_name;
+  	end loop;
+  end loop;
 
--- cleaning se data
-foreach name in array devices_se loop
-	for eminute in select at2.minutes as val from (select att.minutes, case when sensora>1000 OR sensorb>1000 OR sensora=0 or sensorb=0 or (abs(sensora - sensorb)>=4 AND (sensora/sensorb >= 2 OR sensorb/sensora >= 2) ) then 'true' else 'false' end as can_update from (select sensora.minutes,coalesce(sensora.avg, 0) sensora,coalesce(sensorb.avg, 0) sensorb from
-	(select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 5 * interval '5 min' AS minutes,avg(pm25_cf_atm_ugm3) avg from purpleair_se where device_name=name and error is distinct from 1 and created_at > '2017-06-05 00:00:00-05' group by 1) sensora full join
-	(select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 5 * interval '5 min' AS minutes,avg(pm25_cf_atm_ugm3) avg from purpleair_se where device_name=name||'B'	and error is distinct from 1 and created_at > '2017-06-05 00:00:00-05' group by 1) sensorb on sensora.minutes=sensorb.minutes) att) at2 where can_update='true' loop
-		update purpleair_se set error='1' where created_at > eminute.val and created_at < eminute.val + interval '5 minutes' and device_name=name or device_name=name||'B';
-		INSERT INTO purpleairprimary_log (device_name, start_time, end_time, rows_affected, log_time)
-		select device_name, eminute.val, eminute.val + interval '5 minutes', count(*), current_timestamp from purpleair_se where created_at > eminute.val and created_at < eminute.val + interval '5 minutes' and device_name=name or device_name=name||'B' group by device_name;
-	end loop;
-end loop;
+  -- cleaning se data
+  foreach name in array devices_se loop
+  	for eminute in select at2.minutes as val from (select att.minutes, case when sensora>1000 OR sensorb>1000 OR sensora=0 or sensorb=0 or (abs(sensora - sensorb)>=4 AND (sensora/sensorb >= 2 OR sensorb/sensora >= 2) ) then 'true' else 'false' end as can_update from (select sensora.minutes,coalesce(sensora.avg, 0) sensora,coalesce(sensorb.avg, 0) sensorb from
+  	(select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 5 * interval '5 min' AS minutes,avg(pm25_cf_atm_ugm3) avg from purpleair_se where device_name=name and error is distinct from 1 and created_at > '2017-06-05 00:00:00-05' group by 1) sensora full join
+  	(select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 5 * interval '5 min' AS minutes,avg(pm25_cf_atm_ugm3) avg from purpleair_se where device_name=name||'B'	and error is distinct from 1 and created_at > '2017-06-05 00:00:00-05' group by 1) sensorb on sensora.minutes=sensorb.minutes) att) at2 where can_update='true' loop
+  		update purpleair_se set error='1' where created_at > eminute.val and created_at < eminute.val + interval '5 minutes' and device_name=name or device_name=name||'B';
+  		INSERT INTO purpleairprimary_log (device_name, start_time, end_time, rows_affected, log_time)
+  		select device_name, eminute.val, eminute.val + interval '5 minutes', count(*), current_timestamp from purpleair_se where created_at > eminute.val and created_at < eminute.val + interval '5 minutes' and device_name=name or device_name=name||'B' group by device_name;
+  	end loop;
+  end loop;
 
--- cleaning nb data
-foreach name in array devices_nb loop
-	for eminute in select at2.minutes as val from (select att.minutes, case when sensora>1000 OR sensorb>1000 OR sensora=0 or sensorb=0 or (abs(sensora - sensorb)>=4 AND (sensora/sensorb >= 2 OR sensorb/sensora >= 2) ) then 'true' else 'false' end as can_update from (select sensora.minutes,coalesce(sensora.avg, 0) sensora,coalesce(sensorb.avg, 0) sensorb from
-	(select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 5 * interval '5 min' AS minutes,avg(pm25_cf_atm_ugm3) avg from purpleair_nb where device_name=name and error is distinct from 1 and created_at > '2017-06-05 00:00:00-05' group by 1) sensora full join
-	(select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 5 * interval '5 min' AS minutes,avg(pm25_cf_atm_ugm3) avg from purpleair_nb where device_name=name||'B'	and error is distinct from 1 and created_at > '2017-06-05 00:00:00-05' group by 1) sensorb on sensora.minutes=sensorb.minutes) att) at2 where can_update='true' loop
-		update purpleair_nb set error='1' where created_at > eminute.val and created_at < eminute.val + interval '5 minutes' and device_name=name or device_name=name||'B';
-		INSERT INTO purpleairprimary_log (device_name, start_time, end_time, rows_affected, log_time)
-		select device_name, eminute.val, eminute.val + interval '5 minutes', count(*), current_timestamp from purpleair_nb where created_at > eminute.val and created_at < eminute.val + interval '5 minutes' and device_name=name or device_name=name||'B' group by device_name;
-	end loop;
-end loop;
+  -- cleaning nb data
+  foreach name in array devices_nb loop
+  	for eminute in select at2.minutes as val from (select att.minutes, case when sensora>1000 OR sensorb>1000 OR sensora=0 or sensorb=0 or (abs(sensora - sensorb)>=4 AND (sensora/sensorb >= 2 OR sensorb/sensora >= 2) ) then 'true' else 'false' end as can_update from (select sensora.minutes,coalesce(sensora.avg, 0) sensora,coalesce(sensorb.avg, 0) sensorb from
+  	(select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 5 * interval '5 min' AS minutes,avg(pm25_cf_atm_ugm3) avg from purpleair_nb where device_name=name and error is distinct from 1 and created_at > '2017-06-05 00:00:00-05' group by 1) sensora full join
+  	(select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 5 * interval '5 min' AS minutes,avg(pm25_cf_atm_ugm3) avg from purpleair_nb where device_name=name||'B'	and error is distinct from 1 and created_at > '2017-06-05 00:00:00-05' group by 1) sensorb on sensora.minutes=sensorb.minutes) att) at2 where can_update='true' loop
+  		update purpleair_nb set error='1' where created_at > eminute.val and created_at < eminute.val + interval '5 minutes' and device_name=name or device_name=name||'B';
+  		INSERT INTO purpleairprimary_log (device_name, start_time, end_time, rows_affected, log_time)
+  		select device_name, eminute.val, eminute.val + interval '5 minutes', count(*), current_timestamp from purpleair_nb where created_at > eminute.val and created_at < eminute.val + interval '5 minutes' and device_name=name or device_name=name||'B' group by device_name;
+  	end loop;
+  end loop;
 
--- cleaning pc data
-foreach name in array devices_pc loop
-	for eminute in select at2.minutes as val from (select att.minutes, case when sensora>1000 OR sensorb>1000 OR sensora=0 or sensorb=0 or (abs(sensora - sensorb)>=4 AND (sensora/sensorb >= 2 OR sensorb/sensora >= 2) ) then 'true' else 'false' end as can_update from (select sensora.minutes,coalesce(sensora.avg, 0) sensora,coalesce(sensorb.avg, 0) sensorb from
-	(select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 5 * interval '5 min' AS minutes,avg(pm25_cf_atm_ugm3) avg from purpleair_pc where device_name=name and error is distinct from 1 and created_at > '2017-06-05 00:00:00-05' group by 1) sensora full join
-	(select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 5 * interval '5 min' AS minutes,avg(pm25_cf_atm_ugm3) avg from purpleair_pc where device_name=name||'B'	and error is distinct from 1 and created_at > '2017-06-05 00:00:00-05' group by 1) sensorb on sensora.minutes=sensorb.minutes) att) at2 where can_update='true' loop
-		update purpleair_pc set error='1' where created_at > eminute.val and created_at < eminute.val + interval '5 minutes' and device_name=name or device_name=name||'B';
-		INSERT INTO purpleairprimary_log (device_name, start_time, end_time, rows_affected, log_time)
-		select device_name, eminute.val, eminute.val + interval '5 minutes', count(*), current_timestamp from purpleair_pc where created_at > eminute.val and created_at < eminute.val + interval '5 minutes' and device_name=name or device_name=name||'B' group by device_name;
-	end loop;
-end loop;
+  -- cleaning pc data
+  foreach name in array devices_pc loop
+  	for eminute in select at2.minutes as val from (select att.minutes, case when sensora>1000 OR sensorb>1000 OR sensora=0 or sensorb=0 or (abs(sensora - sensorb)>=4 AND (sensora/sensorb >= 2 OR sensorb/sensora >= 2) ) then 'true' else 'false' end as can_update from (select sensora.minutes,coalesce(sensora.avg, 0) sensora,coalesce(sensorb.avg, 0) sensorb from
+  	(select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 5 * interval '5 min' AS minutes,avg(pm25_cf_atm_ugm3) avg from purpleair_pc where device_name=name and error is distinct from 1 and created_at > '2017-06-05 00:00:00-05' group by 1) sensora full join
+  	(select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 5 * interval '5 min' AS minutes,avg(pm25_cf_atm_ugm3) avg from purpleair_pc where device_name=name||'B'	and error is distinct from 1 and created_at > '2017-06-05 00:00:00-05' group by 1) sensorb on sensora.minutes=sensorb.minutes) att) at2 where can_update='true' loop
+  		update purpleair_pc set error='1' where created_at > eminute.val and created_at < eminute.val + interval '5 minutes' and device_name=name or device_name=name||'B';
+  		INSERT INTO purpleairprimary_log (device_name, start_time, end_time, rows_affected, log_time)
+  		select device_name, eminute.val, eminute.val + interval '5 minutes', count(*), current_timestamp from purpleair_pc where created_at > eminute.val and created_at < eminute.val + interval '5 minutes' and device_name=name or device_name=name||'B' group by device_name;
+  	end loop;
+  end loop;
 
--- cleaning lv data
-foreach name in array devices_lv loop
-	for eminute in select at2.minutes as val from (select att.minutes, case when sensora>1000 OR sensorb>1000 OR sensora=0 or sensorb=0 or (abs(sensora - sensorb)>=4 AND (sensora/sensorb >= 2 OR sensorb/sensora >= 2) ) then 'true' else 'false' end as can_update from (select sensora.minutes,coalesce(sensora.avg, 0) sensora,coalesce(sensorb.avg, 0) sensorb from
-	(select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 5 * interval '5 min' AS minutes,avg(pm25_cf_atm_ugm3) avg from purpleair_lv where device_name=name and error is distinct from 1 and created_at > '2017-06-05 00:00:00-05' group by 1) sensora full join
-	(select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 5 * interval '5 min' AS minutes,avg(pm25_cf_atm_ugm3) avg from purpleair_lv where device_name=name||'B'	and error is distinct from 1 and created_at > '2017-06-05 00:00:00-05' group by 1) sensorb on sensora.minutes=sensorb.minutes) att) at2 where can_update='true' loop
-		update purpleair_lv set error='1' where created_at > eminute.val and created_at < eminute.val + interval '5 minutes' and device_name=name or device_name=name||'B';
-		INSERT INTO purpleairprimary_log (device_name, start_time, end_time, rows_affected, log_time)
-		select device_name, eminute.val, eminute.val + interval '5 minutes', count(*), current_timestamp from purpleair_lv where created_at > eminute.val and created_at < eminute.val + interval '5 minutes' and device_name=name or device_name=name||'B' group by device_name;
-	end loop;
-end loop;
+  -- cleaning lv data
+  foreach name in array devices_lv loop
+  	for eminute in select at2.minutes as val from (select att.minutes, case when sensora>1000 OR sensorb>1000 OR sensora=0 or sensorb=0 or (abs(sensora - sensorb)>=4 AND (sensora/sensorb >= 2 OR sensorb/sensora >= 2) ) then 'true' else 'false' end as can_update from (select sensora.minutes,coalesce(sensora.avg, 0) sensora,coalesce(sensorb.avg, 0) sensorb from
+  	(select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 5 * interval '5 min' AS minutes,avg(pm25_cf_atm_ugm3) avg from purpleair_lv where device_name=name and error is distinct from 1 and created_at > '2017-06-05 00:00:00-05' group by 1) sensora full join
+  	(select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 5 * interval '5 min' AS minutes,avg(pm25_cf_atm_ugm3) avg from purpleair_lv where device_name=name||'B'	and error is distinct from 1 and created_at > '2017-06-05 00:00:00-05' group by 1) sensorb on sensora.minutes=sensorb.minutes) att) at2 where can_update='true' loop
+  		update purpleair_lv set error='1' where created_at > eminute.val and created_at < eminute.val + interval '5 minutes' and device_name=name or device_name=name||'B';
+  		INSERT INTO purpleairprimary_log (device_name, start_time, end_time, rows_affected, log_time)
+  		select device_name, eminute.val, eminute.val + interval '5 minutes', count(*), current_timestamp from purpleair_lv where created_at > eminute.val and created_at < eminute.val + interval '5 minutes' and device_name=name or device_name=name||'B' group by device_name;
+  	end loop;
+  end loop;
 
-END;
+  END;
 $$ LANGUAGE 'plpgsql' STRICT;
+
+drop table if exists aeroqualno2_15min;
+drop table if exists aeroqualno2_1hr;
+drop table if exists aeroqualo3_15min;
+drop table if exists aeroqualno2_1hr;
+drop table if exists purpleair_15min;
+drop table if exists purpleair_1hr;
+drop table if exists metone_15min;
+drop table if exists metone_1hr;
 
 -- 15min averages from the raw tables with the good readings (error!=1) equal or greater than 75%
 create table aeroqualno2_15min	as
@@ -200,29 +211,29 @@ select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 6
 
 -- weather summer data
 create table weather_summer(
-site varchar(10),
-latitude  double precision,
-longitude double precision,
-date_time_gmt timestamp with time zone,
-date_time_local timestamp with time zone,
-mean_2m_temp_f double precision,
-dewpt_temp_f double precision,
-wet_bulb_temp_f double precision,
-rh_percent double precision,
-sfc_press_mb double precision,
-wind_speed_10m_mph double precision,
-wind_dir_deg double precision,
-cloud_coverage_percent double precision,
-prev_hour_precip_in double precision,
-direct_normal_irrad_wm2 double precision,
-downward_solar_rad_wm2 double precision,
-diffuse_horiz_rad_wm2 double precision,
-wind_chill_f double precision,
-apparent_temp_f double precision,
-heat_index_f double precision,
-snowfall_in double precision,
-mslp_mb double precision,
-wind_gusts_mph double precision,
+  site varchar(10),
+  latitude  double precision,
+  longitude double precision,
+  date_time_gmt timestamp with time zone,
+  date_time_local timestamp with time zone,
+  mean_2m_temp_f double precision,
+  dewpt_temp_f double precision,
+  wet_bulb_temp_f double precision,
+  rh_percent double precision,
+  sfc_press_mb double precision,
+  wind_speed_10m_mph double precision,
+  wind_dir_deg double precision,
+  cloud_coverage_percent double precision,
+  prev_hour_precip_in double precision,
+  direct_normal_irrad_wm2 double precision,
+  downward_solar_rad_wm2 double precision,
+  diffuse_horiz_rad_wm2 double precision,
+  wind_chill_f double precision,
+  apparent_temp_f double precision,
+  heat_index_f double precision,
+  snowfall_in double precision,
+  mslp_mb double precision,
+  wind_gusts_mph double precision,
 community character varying(2));
 
 -- loading summer weather data from csv files
@@ -240,4 +251,4 @@ update weather_summer set community='NB' where latitude=42.159 and longitude=-87
 update weather_summer set community='LV' where latitude=41.845 and longitude=-87.705;
 
 -- load the data into wundergound converting the pressure from mb to in
-insert into wundergound(observation_time,temp_f, wind_degrees,wind_mph,wind_gust_mph,pressure_in,dewpoint_f,heat_index_f,windchill_f,solarradiation,precip_1hr_in,observation_lat,observation_lng,community) select date_time_local,mean_2m_temp_f,wind_dir_deg,wind_speed_10m_mph,wind_gusts_mph,sfc_press_mb*0.02953,dewpt_temp_f,heat_index_f,wind_chill_f,downward_solar_rad_wm2,prev_hour_precip_in,latitude,longitude,community from weather_summer where to_char(date_time_local,'YYYY-DD-MM HH24:MI:SS')!='2017-11-05 01:00:00' and community!='NB';
+insert into wundergound(observation_time,temp_f, wind_degrees,wind_mph,wind_gust_mph,pressure_in,dewpoint_f,heat_index_f,windchill_f,solarradiation,precip_1hr_in,observation_lat,observation_lng,community) select date_time_gmt at time zone 'utc' at time zone 'america/chicago',mean_2m_temp_f,wind_dir_deg,wind_speed_10m_mph,wind_gusts_mph,sfc_press_mb*0.02953,dewpt_temp_f,heat_index_f,wind_chill_f,downward_solar_rad_wm2,prev_hour_precip_in,latitude,longitude,community from weather_summer;
