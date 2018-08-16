@@ -171,43 +171,52 @@ CREATE OR REPLACE FUNCTION clean_purpleairprimary() RETURNS void AS $$
 $$ LANGUAGE 'plpgsql' STRICT;
 
 drop table if exists aeroqualno2_15min;
-drop table if exists aeroqualno2_1hr;
 drop table if exists aeroqualo3_15min;
-drop table if exists aeroqualno2_1hr;
 drop table if exists purpleair_15min;
-drop table if exists purpleair_1hr;
 drop table if exists metone_15min;
+drop table if exists aeroqualno2_1hr;
+drop table if exists aeroqualno2_1hr;
+drop table if exists purpleair_1hr;
 drop table if exists metone_1hr;
+drop table if exists metone_24hr;
 
 -- 15min averages from the raw tables with the good readings (error!=1) equal or greater than 75%
 create table aeroqualno2_15min	as
-select date_trunc('hour', date) + date_part('minute', date)::int / 15 * interval '15 min' AS date, monitorid, locationid, avg(no2ppm) AS no2ppm_avg, unit_id, season, community,sum(case when error is distinct from 1 then 1 else 0 end) AS no_of_readings from aeroqualno2 where error is distinct from 1 group by 1, monitorid, locationid, unit_id, season, community having (sum(case when error is distinct from 1 then 1 else 0 end)*100)/count(*)>= 75 order by 1;
+select date_trunc('hour', date) + date_part('minute', date)::int / 15 * interval '15 min' AS date, monitorid, locationid, avg(case when flag is null then no2ppm end) AS no2ppm_avg, unit_id, season, community,sum(case when flag is distinct from 90 then 1 else 0 end) AS no_of_readings from aeroqualno2 where flag is distinct from 90 group by 1, monitorid, locationid, unit_id, season, community having sum(case when flag is distinct from 90 then 1 else 0 end)>1 and (sum(case when flag is null then 1 else 0 end)*100)/sum(case when flag is distinct from 90 then 1 else 0 end)>= 75 order by 1;
 
 create table aeroqualo3_15min	as
-select date_trunc('hour', date) + date_part('minute', date)::int / 15 * interval '15 min' AS date, monitorid, locationid, avg(o3ppm) AS o3ppm_avg, unit_id, season, community,sum(case when error is distinct from 1 then 1 else 0 end) AS no_of_readings from aeroqualo3 where error is distinct from 1 group by 1, monitorid, locationid, unit_id, season, community having (sum(case when error is distinct from 1 then 1 else 0 end)*100)/count(*)>= 75 order by 1;
+select date_trunc('hour', date) + date_part('minute', date)::int / 15 * interval '15 min' AS date, monitorid, locationid, avg(case when flag is null then o3ppm end) AS o3ppm_avg, unit_id, season, community,sum(case when flag is distinct from 90 then 1 else 0 end) AS no_of_readings from aeroqualo3 where flag is distinct from 90 group by 1, monitorid, locationid, unit_id, season, community having sum(case when flag is distinct from 90 then 1 else 0 end)>1 and (sum(case when flag is null then 1 else 0 end)*100)/sum(case when flag is distinct from 90 then 1 else 0 end)>= 75 order by 1;
 
 -- metone not many reading, it is just three or less
 create table metone_15min	as
-select date_trunc('hour', time) + date_part('minute', time)::int / 15 * interval '15 min' AS time, type, avg(value) AS value_avg, unit_id, device, season, community,sum(case when error is distinct from 1 then 1 else 0 end) AS no_of_readings from metone where error is distinct from 1 group by 1, type, unit_id, device, season, community having (sum(case when error is distinct from 1 then 1 else 0 end)*100)/count(*)>= 75 order by 1;
+select date_trunc('hour', time) + date_part('minute', time)::int / 15 * interval '15 min' AS time, type, avg(case when flag is null then value end) AS value_avg, unit_id, device, season, community,sum(case when flag is distinct from 90 then 1 else 0 end) AS no_of_readings from metone where flag is distinct from 90 group by 1, type, unit_id, device, season, community having sum(case when flag is distinct from 90 then 1 else 0 end)>1 and (sum(case when flag is null then 1 else 0 end)*100)/sum(case when flag is distinct from 90 then 1 else 0 end)>= 75 order by 1;
 
 -- no partitioned table for purpleair_15min
 create table purpleair_15min as
-select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 15 * interval '15 min' AS created_at, avg(pm1_cf_atm_ugm3) AS pm1_cf_atm_ugm3_avg, avg(pm25_cf_atm_ugm3) AS pm25_cf_atm_ugm3_avg, avg(pm10_cf_atm_ugm3) AS pm10_cf_atm_ugm3_avg, avg(uptimeminutes) uptimeminutes_avg, avg(rssi_dbm) rssi_dbm_avg, avg(temperature_f) temperature_f_avg, avg(pm25_cf_1_ugm3) pm25_cf_1_ugm3_avg, device_name, season, community, sum(case when error is distinct from 1 then 1 else 0 end) AS no_of_readings from purpleair group by 1, device_name, season, community having (sum(case when error is distinct from 1 then 1 else 0 end)*100)/count(*)>= 75 order by 1;
+select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 15 * interval '15 min' AS created_at, avg(case when flag is null then pm1_cf_atm_ugm3 end) AS pm1_cf_atm_ugm3_avg, avg(case when flag is null then pm25_cf_atm_ugm3 end) AS pm25_cf_atm_ugm3_avg, avg(case when flag is null then pm10_cf_atm_ugm3 end) AS pm10_cf_atm_ugm3_avg, avg(uptimeminutes) uptimeminutes_avg, avg(rssi_dbm) rssi_dbm_avg, avg(temperature_f) temperature_f_avg, avg(pm25_cf_1_ugm3) pm25_cf_1_ugm3_avg, device_name, season, community, sum(case when flag is distinct from 90 then 1 else 0 end) AS no_of_readings from purpleair group by 1, device_name, season, community having sum(case when flag is distinct from 90 then 1 else 0 end)>1 and (sum(case when flag is null then 1 else 0 end)*100)/sum(case when flag is distinct from 90 then 1 else 0 end)>= 75 order by 1;
 
 -- 1 hour averages from the raw tables with the good readings (error!=1) equal or greater than 75%
+drop table if exists aeroqualno2_1hr;
 create table aeroqualno2_1hr	as
-select date_trunc('hour', date) + date_part('minute', date)::int / 60 * interval '60 min' AS date, monitorid, locationid, avg(no2ppm) AS no2ppm_avg, unit_id, season, community,sum(case when error is distinct from 1 then 1 else 0 end) AS no_of_readings from aeroqualno2 where error is distinct from 1 group by 1, monitorid, locationid, unit_id, season, community having (sum(case when error is distinct from 1 then 1 else 0 end)*100)/count(*)>= 75 order by 1;
+select date_trunc('hour', date) + date_part('minute', date)::int / 60 * interval '60 min' AS date, monitorid, locationid, avg(no2ppm) AS no2ppm_avg, unit_id, season, community,sum(case when flag is distinct from 90 then 1 else 0 end) AS no_of_readings from aeroqualno2 where flag is distinct from 90 group by 1, monitorid, locationid, unit_id, season, community having sum(case when flag is distinct from 90 then 1 else 0 end)>1 and (sum(case when flag is null then 1 else 0 end)*100)/sum(case when flag is distinct from 90 then 1 else 0 end)>= 75 order by 1;
 
+drop table if exists aeroqualo3_1hr;
 create table aeroqualo3_1hr	as
-select date_trunc('hour', date) + date_part('minute', date)::int / 60 * interval '60 min' AS date, monitorid, locationid, avg(o3ppm) AS o3ppm_avg, unit_id, season, community,sum(case when error is distinct from 1 then 1 else 0 end) AS no_of_readings from aeroqualo3 where error is distinct from 1 group by 1, monitorid, locationid, unit_id, season, community having (sum(case when error is distinct from 1 then 1 else 0 end)*100)/count(*)>= 75 order by 1;
+select date_trunc('hour', date) + date_part('minute', date)::int / 60 * interval '60 min' AS date, monitorid, locationid, avg(o3ppm) AS o3ppm_avg, unit_id, season, community,sum(case when flag is distinct from 90 then 1 else 0 end) AS no_of_readings from aeroqualo3 where flag is distinct from 90 group by 1, monitorid, locationid, unit_id, season, community having sum(case when flag is distinct from 90 then 1 else 0 end)>1 and (sum(case when flag is null then 1 else 0 end)*100)/sum(case when flag is distinct from 90 then 1 else 0 end)>= 75 order by 1;
 
 -- metone not many reading, it is just three or less
+drop table if exists metone_1hr;
 create table metone_1hr	as
-select date_trunc('hour', time) + date_part('minute', time)::int / 60 * interval '60 min' AS time, type, avg(value) AS value_avg, unit_id, device, season, community,sum(case when error is distinct from 1 then 1 else 0 end) AS no_of_readings from metone where error is distinct from 1 group by 1, type, unit_id, device, season, community having (sum(case when error is distinct from 1 then 1 else 0 end)*100)/count(*)>= 75 order by 1;
+select date_trunc('hour', time) + date_part('minute', time)::int /60 * interval '60 min' AS time, type, avg(value) AS avg_value, max(value) AS max_value, min(value) AS min_value,unit_id, device, season, community,sum(case when error is null then 1 else 0 end) AS no_of_readings from metone where flag is distinct from 90 group by 1, type, unit_id, device, season, community having sum(case when flag is distinct from 90 then 1 else 0 end)>1 and (sum(case when flag is null then 1 else 0 end)*100)/sum(case when flag is distinct from 90 then 1 else 0 end)>= 75 order by 1;
+drop table if exists metone_24hr;
+create table metone_24hr	as
+select date(time) AS time, type, avg(value) AS avg_value, max(value) AS max_value, min(value) AS min_value,unit_id, device, season, community,sum(case when error is null then 1 else 0 end) AS no_of_readings from metone where flag is distinct from 90 group by 1, type, unit_id, device, season, community having sum(case when flag is distinct from 90 then 1 else 0 end)>1 and (sum(case when flag is null then 1 else 0 end)*100)/sum(case when flag is distinct from 90 then 1 else 0 end)>= 75 order by 1;
 
 -- no partitioned table for purpleair_1hr
+drop table if exists purpleair_1hr;
 create table purpleair_1hr as
-select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 60 * interval '60 min' AS created_at, avg(pm1_cf_atm_ugm3) AS pm1_cf_atm_ugm3_avg, avg(pm25_cf_atm_ugm3) AS pm25_cf_atm_ugm3_avg, avg(pm10_cf_atm_ugm3) AS pm10_cf_atm_ugm3_avg, avg(uptimeminutes) uptimeminutes_avg, avg(rssi_dbm) rssi_dbm_avg, avg(temperature_f) temperature_f_avg, avg(pm25_cf_1_ugm3) pm25_cf_1_ugm3_avg, device_name, season, community, sum(case when error is distinct from 1 then 1 else 0 end) AS no_of_readings from purpleair group by 1, device_name, season, community having (sum(case when error is distinct from 1 then 1 else 0 end)*100)/count(*)>= 75 order by 1;
+select date_trunc('hour', created_at) + date_part('minute', created_at)::int / 60 * interval '60 min' AS created_at, avg(pm1_cf_atm_ugm3) AS pm1_cf_atm_ugm3_avg, avg(pm25_cf_atm_ugm3) AS pm25_cf_atm_ugm3_avg, avg(pm10_cf_atm_ugm3) AS pm10_cf_atm_ugm3_avg, avg(uptimeminutes) uptimeminutes_avg, avg(rssi_dbm) rssi_dbm_avg, avg(temperature_f) temperature_f_avg, avg(pm25_cf_1_ugm3) pm25_cf_1_ugm3_avg, device_name, season, community, sum(case when flag is distinct from 90 then 1 else 0 end) AS no_of_readings from purpleair group by 1, device_name, season, community having sum(case when flag is distinct from 90 then 1 else 0 end)>1 and (sum(case when flag is null then 1 else 0 end)*100)/sum(case when flag is distinct from 90 then 1 else 0 end)>= 75 order by 1;
+
 
 -- weather summer data
 create table weather_summer(
@@ -237,11 +246,18 @@ create table weather_summer(
 community character varying(2));
 
 -- loading summer weather data from csv files
+truncate table weather_summer;
 \COPY weather_summer(site,latitude,longitude,date_time_gmt,date_time_local,mean_2m_temp_f,dewpt_temp_f,wet_bulb_temp_f,rh_percent,sfc_press_mb,wind_speed_10m_mph,wind_dir_deg,cloud_coverage_percent,prev_hour_precip_in,direct_normal_irrad_wm2,downward_solar_rad_wm2,diffuse_horiz_rad_wm2,wind_chill_f,apparent_temp_f,heat_index_f,snowfall_in,mslp_mb,wind_gusts_mph) FROM '/home/v/vijayv/summer_weather_data/41.845_-87.705HistoricalData.csv' DELIMITER ',' CSV HEADER;
 \COPY weather_summer(site,latitude,longitude,date_time_gmt,date_time_local,mean_2m_temp_f,dewpt_temp_f,wet_bulb_temp_f,rh_percent,sfc_press_mb,wind_speed_10m_mph,wind_dir_deg,cloud_coverage_percent,prev_hour_precip_in,direct_normal_irrad_wm2,downward_solar_rad_wm2,diffuse_horiz_rad_wm2,wind_chill_f,apparent_temp_f,heat_index_f,snowfall_in,mslp_mb,wind_gusts_mph) FROM '/home/v/vijayv/summer_weather_data/41.858_-87.620HistoricalData.csv' DELIMITER ',' CSV HEADER;
 \COPY weather_summer(site,latitude,longitude,date_time_gmt,date_time_local,mean_2m_temp_f,dewpt_temp_f,wet_bulb_temp_f,rh_percent,sfc_press_mb,wind_speed_10m_mph,wind_dir_deg,cloud_coverage_percent,prev_hour_precip_in,direct_normal_irrad_wm2,downward_solar_rad_wm2,diffuse_horiz_rad_wm2,wind_chill_f,apparent_temp_f,heat_index_f,snowfall_in,mslp_mb,wind_gusts_mph) FROM '/home/v/vijayv/summer_weather_data/41.692_-87.533HistoricalData.csv' DELIMITER ',' CSV HEADER;
 \COPY weather_summer(site,latitude,longitude,date_time_gmt,date_time_local,mean_2m_temp_f,dewpt_temp_f,wet_bulb_temp_f,rh_percent,sfc_press_mb,wind_speed_10m_mph,wind_dir_deg,cloud_coverage_percent,prev_hour_precip_in,direct_normal_irrad_wm2,downward_solar_rad_wm2,diffuse_horiz_rad_wm2,wind_chill_f,apparent_temp_f,heat_index_f,snowfall_in,mslp_mb,wind_gusts_mph) FROM '/home/v/vijayv/summer_weather_data/42.159_-87.776HistoricalData.csv' DELIMITER ',' CSV HEADER;
 \COPY weather_summer(site,latitude,longitude,date_time_gmt,date_time_local,mean_2m_temp_f,dewpt_temp_f,wet_bulb_temp_f,rh_percent,sfc_press_mb,wind_speed_10m_mph,wind_dir_deg,cloud_coverage_percent,prev_hour_precip_in,direct_normal_irrad_wm2,downward_solar_rad_wm2,diffuse_horiz_rad_wm2,wind_chill_f,apparent_temp_f,heat_index_f,snowfall_in,mslp_mb,wind_gusts_mph) FROM '/home/v/vijayv/summer_weather_data/41.845_-87.705HistoricalData.csv' DELIMITER ',' CSV HEADER;
+\COPY weather_summer(site,latitude,longitude,date_time_gmt,date_time_local,mean_2m_temp_f,dewpt_temp_f,wet_bulb_temp_f,rh_percent,sfc_press_mb,cloud_coverage_percent,wind_chill_f,apparent_temp_f,wind_speed_10m_mph,wind_dir_deg,prev_hour_precip_in,downward_solar_rad_wm2,diffuse_horiz_rad_wm2,direct_normal_irrad_wm2,mslp_mb,heat_index_f,snowfall_in,wind_gusts_mph,community) FROM '/home/v/vijayv/summer_weather_data/LV_7012017to8102017_41.844673_-87.705058.csv' DELIMITER ',' CSV HEADER;
+\COPY weather_summer(site,latitude,longitude,date_time_gmt,date_time_local,mean_2m_temp_f,dewpt_temp_f,wet_bulb_temp_f,rh_percent,sfc_press_mb,cloud_coverage_percent,wind_chill_f,apparent_temp_f,wind_speed_10m_mph,wind_dir_deg,prev_hour_precip_in,downward_solar_rad_wm2,diffuse_horiz_rad_wm2,direct_normal_irrad_wm2,mslp_mb,heat_index_f,snowfall_in,wind_gusts_mph,community) FROM '/home/v/vijayv/summer_weather_data/SL_9082017to9182017_41.858498_-87.619919.csv' DELIMITER ',' CSV HEADER;
+\COPY weather_summer(site,latitude,longitude,date_time_gmt,date_time_local,mean_2m_temp_f,dewpt_temp_f,wet_bulb_temp_f,rh_percent,sfc_press_mb,cloud_coverage_percent,wind_chill_f,apparent_temp_f,wind_speed_10m_mph,wind_dir_deg,prev_hour_precip_in,downward_solar_rad_wm2,diffuse_horiz_rad_wm2,direct_normal_irrad_wm2,mslp_mb,heat_index_f,snowfall_in,wind_gusts_mph,community) FROM '/home/v/vijayv/summer_weather_data/SE_8092017to8102017_41.691509_-87.533386.csv' DELIMITER ',' CSV HEADER;
+\COPY weather_summer(site,latitude,longitude,date_time_gmt,date_time_local,mean_2m_temp_f,dewpt_temp_f,wet_bulb_temp_f,rh_percent,sfc_press_mb,cloud_coverage_percent,wind_chill_f,apparent_temp_f,wind_speed_10m_mph,wind_dir_deg,prev_hour_precip_in,downward_solar_rad_wm2,diffuse_horiz_rad_wm2,direct_normal_irrad_wm2,mslp_mb,heat_index_f,snowfall_in,wind_gusts_mph,community) FROM '/home/v/vijayv/summer_weather_data/SE_7132017to7152017_41.691509_-87.533386.csv' DELIMITER ',' CSV HEADER;
+\COPY weather_summer(site,latitude,longitude,date_time_gmt,date_time_local,mean_2m_temp_f,dewpt_temp_f,wet_bulb_temp_f,rh_percent,sfc_press_mb,cloud_coverage_percent,wind_chill_f,apparent_temp_f,wind_speed_10m_mph,wind_dir_deg,prev_hour_precip_in,downward_solar_rad_wm2,diffuse_horiz_rad_wm2,direct_normal_irrad_wm2,mslp_mb,heat_index_f,snowfall_in,wind_gusts_mph,community) FROM '/home/v/vijayv/summer_weather_data/PC_8112017to8122017_41.656588_-87.6.csv' DELIMITER ',' CSV HEADER;
+\COPY weather_summer(site,latitude,longitude,date_time_gmt,date_time_local,mean_2m_temp_f,dewpt_temp_f,wet_bulb_temp_f,rh_percent,sfc_press_mb,cloud_coverage_percent,wind_chill_f,apparent_temp_f,wind_speed_10m_mph,wind_dir_deg,prev_hour_precip_in,downward_solar_rad_wm2,diffuse_horiz_rad_wm2,direct_normal_irrad_wm2,mslp_mb,heat_index_f,snowfall_in,wind_gusts_mph,community) FROM '/home/v/vijayv/summer_weather_data/LV_4122017to5302017_41.844673_-87.705058.csv' DELIMITER ',' CSV HEADER;
 
 -- update community based on lat long
 update weather_summer set community='PC' where latitude=41.657 and longitude=-87.600;
@@ -250,5 +266,25 @@ update weather_summer set community='SE' where latitude=41.692 and longitude=-87
 update weather_summer set community='NB' where latitude=42.159 and longitude=-87.776;
 update weather_summer set community='LV' where latitude=41.845 and longitude=-87.705;
 
+
 -- load the data into wundergound converting the pressure from mb to in
-insert into wundergound(observation_time,temp_f, wind_degrees,wind_mph,wind_gust_mph,pressure_in,dewpoint_f,heat_index_f,windchill_f,solarradiation,precip_1hr_in,observation_lat,observation_lng,community) select date_time_gmt at time zone 'utc' at time zone 'america/chicago',mean_2m_temp_f,wind_dir_deg,wind_speed_10m_mph,wind_gusts_mph,sfc_press_mb*0.02953,dewpt_temp_f,heat_index_f,wind_chill_f,downward_solar_rad_wm2,prev_hour_precip_in,latitude,longitude,community from weather_summer;
+delete from wundergound where date(observation_time)<=date('2017-12-10');
+insert into wundergound(observation_time,temp_f, wind_degrees,wind_mph,wind_gust_mph,pressure_in,dewpoint_f,heat_index_f,windchill_f,solarradiation,precip_1hr_in,observation_lat,observation_lng,community,relative_humidity) select distinct date_time_gmt at time zone 'utc' at time zone 'america/chicago',mean_2m_temp_f,wind_dir_deg,wind_speed_10m_mph,wind_gusts_mph,sfc_press_mb*0.02953,dewpt_temp_f,heat_index_f,wind_chill_f,downward_solar_rad_wm2,prev_hour_precip_in,latitude,longitude,community ,rh_percent from weather_summer;
+// where not exists (select 1 from wundergound where observation_time=date_time_gmt at time zone 'utc' at time zone 'america/chicago' and community=weather_summer_new.community);
+
+delete from wundergound where date(observation_time)>=date('2017-07-13') and date(observation_time)<=date('2017-07-16') and community='SE';
+delete from wundergound where date(observation_time)>=date('2017-08-09') and date(observation_time)<=date('2017-08-11') and community='SE';
+delete from wundergound where date(observation_time)>=date('2017-08-11') and date(observation_time)<=date('2017-08-13') and community='PC';
+delete from wundergound where date(observation_time)>=date('2017-09-08') and date(observation_time)<=date('2017-09-19') and community='SL';
+delete from wundergound where date(observation_time)>=date('2017-04-12') and date(observation_time)<=date('2017-05-30') and community='LV';
+delete from wundergound where date(observation_time)>=date('2017-04-12') and date(observation_time)<=date('2017-08-11') and community='LV';
+
+LV_4122017to5302017_41.844673_-87.705058.csv
+LV_7012017to8102017_41.844673_-87.705058.csv
+PC_8112017to8122017_41.656588_-87.6.csv
+SE_7132017to7152017_41.691509_-87.533386.csv
+SE_8092017to8102017_41.691509_-87.533386.csv
+SL_9082017to9182017_41.858498_-87.619919.csv
+
+
+select from wundergound where observation_time=

@@ -35,13 +35,12 @@ update airterrier set session_title='PC3_0814AM' where session_title='pc3_0814_a
 update airterrier set session_title='PC3_0818AM' where session_title='pc3_0818am';
 update airterrier set session_title='PC3_0821PM' where session_title='pc3_0821am';
 update airterrier set session_title='PC3_0825PM' where session_title='pc3_0825';
-update airterrier set session_title='PC3_0828PM' where session_title='pc3_0828pmt';
-update airterrier set session_title='PC3_0828PM' where session_title='pc3_0828pmt';
+update airterrier set session_title='PC3_0828PMT' where session_title='pc3_0828pmt';
 update airterrier set session_title='PC3_0830PM' where session_title='pc3_0830';
 update airterrier set session_title='PC3_0831PM' where session_title='pc3_0831';
 update airterrier set session_title='PC4_0818AM' where session_title='pc4_0818am';
 update airterrier set session_title='PC4_0817PM' where session_title='pc4_0817pm';
-update airterrier set session_title='PC4_0818PM' where session_title='pc4_0818pmt';
+update airterrier set session_title='PC4_0818PMT' where session_title='pc4_0818pmt';
 update airterrier set session_title='PC4_0821AM' where session_title='pc4_0821pm';
 update airterrier set session_title='PC4_0823PM' where session_title='pc4_0823pm';
 update airterrier set session_title='PC4_0825PM' where session_title='pc4_0825pm';
@@ -83,8 +82,14 @@ update airterrier set session_title='PC00_0228AM' where session_title='pcc feb28
 update airterrier set session_title='PC9_0504PMT' where session_title='pc9_0504pmt2';
 update airterrier set session_title='PC9_0504PMT' where session_title='pc9_0504pmt3';
 update airterrier set session_title='PC4_0830AM' where session_title='pc4_0830_am';
-
+-- session_title was empty
+update airterrier set session_title ='PC0_0830PM',community='PC',season='Summer' where date(time)=date('2017-08-30') and session_title='PC_0830PM';
+update airterrier set session_title='PC0_0831PM',community='PC',season='Summer' where session_title='' and date(time)=date('2017-08-31');
 
 -- Fix Purple Air that wasn't re-registered
 update purpleairprimary set device_name='SASA_PA2_PC_S' where device_name='SASA_PA6_SE_S6' and created_at > '2017-08-10 00:00:00-05';
 update purpleairprimary set device_name='SASA_PA2_PC_SB' where device_name='SASA_PA6_SE_S6B' and created_at > '2017-08-10 00:00:00-05';
+update purpleair set device_name='SASA_PA7_SL_W' where device_name='1138 PLYMOUTH';
+update purpleair set device_name='SASA_PA7_SL_WB' where device_name='1138 PLYMOUTH B';
+update purpleair set season='Winter',community='SL' where device_name='SASA_PA7_SL_W';
+update purpleair set season='Winter',community='SL' where device_name='SASA_PA7_SL_WB';

@@ -34,3 +34,8 @@ insert into stationarylocations(unit_id,latitude,longitude,community) values('SA
 insert into stationarylocations(unit_id,latitude,longitude,community) values('SASA_PA7B',41.850941,-87.684403,'LV');
 insert into stationarylocations(unit_id,latitude,longitude,community) values('SASA_PA8',41.849809,-87.696619,'LV');
 insert into stationarylocations(unit_id,latitude,longitude,community) values('SASA_PA8B',41.849809,-87.696619,'LV');
+update stationarylocations set latitude=41.701407,longitude=-87.542820,address='10644 S Mackinaw Ave' where unit_id in ('SASA_PA7_SE_W','SASA_PA7_SE_WB') and community='SE' and season='Winter' and source='purpleair';
+insert into stationarylocations(unit_id,latitude,longitude,address,community,season,source) values ('SASA_PA7_SL_W',41.868877, -87.629415,'1138 South Plymouth Court, Chicago, IL, USA','SL','Winter','purpleair');
+update stationarylocations set latest_reading_date='2017-09-01 11:50:33-05',earliest_reading_date='2017-08-25 14:41:32-05' where unit_id='SASA_PA3_PC_S';
+update stationarylocations set latest_reading_date='2017-09-20 17:45:18-05',earliest_reading_date='2017-07-27 11:48:35-05' where unit_id='SASA_PA10_PC_S';
+update stationarylocations set latest_reading_date='2018-05-31 18:59:33-05',earliest_reading_date='2018-04-13 11:40:30-05' where unit_id='SASA_PA7_SL_W';
